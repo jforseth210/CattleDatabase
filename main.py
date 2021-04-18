@@ -1,6 +1,4 @@
-from json import dumps
-from random import randint
-import uuid
+import json
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -8,45 +6,55 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
 
-@app.route("/")
-def hello():
-    cow = Cow(tag_number=f"<>{randint(100,999)}", id=str(uuid.uuid4()))
-    db.session.add(cow)
-    cow.add_event(date=f"{randint(1990,2021)}-{randint(1,12)}-{randint(1,31)}", name="Born", description=f"My name is {cow.tag_number} and I was born")
-    cow.add_event(date=f"{randint(1990,2021)}-{randint(1,12)}-{randint(1,31)}", name="Died", description=f"My name is {cow.tag_number} and I died")
-    db.session.commit()
-    return ""
-@app.route("/cows")
-def cows():
-    return dumps([cow.get_events() for cow in Cow.query.all()])
+calendar = db.Table('calendar', 
+    db.Column('cow_id', db.Integer, db.ForeignKey('cow.cow_id')),
+    db.Column('event_id', db.Integer, db.ForeignKey('event.event_id'))
+)
+
 
 class Cow(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    tag_number = db.Column(db.String(6))
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
-    events = db.relationship('Event', backref=db.backref('cows', lazy=True))
-
-    def __init__(self, **kwargs):
-        super(Cow, self).__init__(**kwargs)
-
-    def moo(self):
-        print(f"{self.tag_number} mooed")
+    cow_id = db.Column(db.Integer, primary_key=True)
+    tag_number = db.Column(db.String(8))
+    events = db.relationship("Event", secondary=calendar, backref=db.backref('cows', lazy='dynamic'))
     
-    def add_event(self, date, name, description):
-        print(f"Passing: date={date}, name={name}, description={description}, cow_id={self.id}")
-        event = Event(date=date, name=name, description=description, cow_id=self.id)
+    dam_id=db.Column(db.Integer, db.ForeignKey('cow.cow_id'))
+    sire_id=db.Column(db.Integer, db.ForeignKey('cow.cow_id'))
+    
+    def get_dam(self):
+        return Cow.query.filter_by(cow_id = self.dam_id).first()
+
+    def get_sire(self):
+        return Cow.query.filter_by(cow_id = self.sire_id).first()
+
     def get_events(self):
-        return f"{self.tag_number}:<br/>" + dumps([repr(event) for event in Event.query.all()])
+        return self.events
 
 class Event(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String(10))
-    name = db.Column(db.Text)
+    name = db.Column(db.String(100))
     description = db.Column(db.Text)
-    cow_id = db.Column(db.Text)
-    #cow =  db.relationship('Cow', backref=db.backref('events', lazy=True))
 
-    def __repr__(self):
-        return f"Event:{self.name}  Description:{self.description}  Date:{self.date}"
+    def get_cows():
+        return self.cows
+
+@app.route("/datadump")
+def datadump():
+    cows = Cow.query.all()
+    for cow in cows:
+        events = cow.events
+        for event in events:
+            print(cow.tag_number + ": " + event.name + " " + event.date)
+    return ""
+
+@app.route('/getparents/<tag_number>')
+def get_parents(tag_number):
+    calf = Cow.query.filter_by(tag_number=tag_number).first()
+    dam = calf.get_dam()
+    sire = calf.get_sire()
+    print(f"{tag_number}'s parents are:")
+    print(f"Sire: {sire.tag_number}")
+    print(f"Dam: {dam.tag_number}")
+    return ""
 if __name__ == "__main__":
     app.run()
