@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title%}Search results for {{query}}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Search results for "{{ query }}":</h2>
+    <ul>
+        <a class="d-inline" href="#">
+            <li>
+                <h5 class="my-3">&lt&gt814</h5>
+            </li>
+        </a>
+        <a class="d-inline" href="#">
+            <li>
+                <h5 class="my-3">&lt&gt772</h5>
+            </li>
+        </a>
+        <a class="d-inline" href="#">
+            <li>
+                <h5 class="my-3">Branding</h5>
+            </li>
+        </a>
+        <a class="d-inline" href="#">
+            <li>
+                <h5 class="my-3">Clipping Brands</h5>
+            </li>
+        </a>
+    </ul>
+</div>
+{% endblock %}
