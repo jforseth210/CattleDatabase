@@ -78,7 +78,14 @@ def home():
 @app.route("/cow/<tag_number>")
 def showCow(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
-    return render_template("cow.html", cow=cow)
+    if not cow:
+        return redirect("/")
+    return render_template("cow.html", cow=cow, cows=get_cows())
+
+@app.route("/cowexists/<tag_number>")
+def cow_exists(tag_number):
+    cow = Cow.query.filter_by(tag_number=tag_number).first()
+    return "True" if cow else "False"
 
 @app.route("/newCow", methods=["POST"])
 def new_cow():
@@ -96,10 +103,10 @@ def new_cow():
         tag_number=tag_number
     )
 
-    db.session.add(new_cow)
-    db.session.commit()
+    #db.session.add(new_cow)
+    #db.session.commit()
     return redirect("/")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

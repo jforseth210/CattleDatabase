@@ -1,5 +1,175 @@
-{% extends 'base.html' %}
-{% block title%}Cattle Records{% endblock %}
-{% block content %}
-<h2>{{cow.tag_number}}</h2>
+{% extends 'base.html' %} {% block title%}Cattle Records{% endblock %} {% block
+content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.elTpLVI3yCYJKV4xWWM-JwHaE7%26pid%3DApi&f=1" alt="Red Angus Cow" class="card-img-top">
+            <small><i>This isn't {{cow.tag_number}}, I just thought a picture would look good here.</i></small>
+            <div class="card-body">
+                <h2 class="card-title">{{cow.tag_number}}</h2>
+                <small><i>System Id: #000{{cow.cow_id}}</i></small>
+                <ul>
+                <li>Owned By: {{cow.owner}}</li>
+                <li>Sex: {{cow.sex}}</li>
+                {% if cow.dam_id %}
+                <li>
+                  <a href="/cow/{{cow.get_dam().tag_number}}"
+                    >Dam: {{cow.get_dam().tag_number}}</a
+                  >
+                </li>
+                {% endif %} {% if cow.sire_id %}
+                <li>
+                  <a href="/cow/{{cow.get_dam().tag_number}}"
+                    >Dam: {{cow.get_dam().tag_number}}</a
+                  >
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="offspring-tab" data-toggle="tab" href="#offspring" role="tab" aria-controls="offspring" aria-selected="true">Offspring</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="events-tab" data-toggle="tab" href="#events" role="tab" aria-controls="events" aria-selected="false">Events</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="offspring" role="tabpanel" aria-labelledby="offspring-tab">
+                <table class=table>
+                </tr>
+                <th>Cow</th>
+                <th>Born</th>
+                <th>Owner</th>
+                <th>Sex</th>                    
+                {% if cow.sex in ["Cow", "Heifer"] %}
+                <th>
+                   Sire
+                </th>
+                {% else %}
+                <th>
+                   Dam
+                </th>
+                {% endif %}
+                <th>Calves</th>
+                </tr>
+                {% for calf in cow.get_calves() %}
+                <tr >
+                    <td class="w-25">
+                        <h7><a href="/cow/{{calf.tag_number}}">{{ calf.tag_number }}</a><h7>
+                    </td>
+                    <td>
+                        <h7>{{ calf.get_birthdate() }}<h7>
+                    </td>
+                    <td>
+                        <h7>{{ calf.owner }}<h7>
+                    </td>
+                    <td>
+                        <h7>{{ calf.sex }}<h7>
+                    </td>
+                    {% if cow.sex in ["Cow", "Heifer"] %}
+                    <td>
+                        <h7>{{ calf.get_sire().tag_number }}</h7>
+                    </td>
+                    {% else %}
+                    <td>
+                        <h7>{{ calf.get_dam().tag_number }}</h7>
+                    </td>
+                    {% endif %}
+                    <td>
+                        <h7>{% for grandcalf in calf.get_calves() %} {{grandcalf.tag_number}}{% if not loop.last %}, {% endif %}{% endfor %}</h7>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <button class="m-2 btn btn-success" data-toggle="modal" data-target="#newCowModal">Add Calf</button>
+            </div>
+            <div class="tab-pane fade show" id="events" role="tabpanel" aria-labelledby="events-tab">
+                <table class=table>
+                </tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Description</th>      
+                </tr>
+                {% for event in cow.events %}
+                <tr >
+                    <td class="w-25">
+                        <h7>{{event.date}}<h7>
+                    </td>
+                    <td class="w-25">
+                        <h7>{{event.name}}<h7>
+                    </td>
+                    <td class="w-25">
+                        <h7>{{event.description}}<h7>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            </div>
+          </div>
+    </div>
+  </div>
+  <div class="modal fade" id="newCowModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Cow</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="newCowForm" method="post" action="/newCow" onsubmit="event.preventDefault();validateTagNumber(document.getElementById('newCowTagNumber'))">
+                        {% if cow.sex in ["Cow", "Heifer"] %}
+                        <h5>Sire:</h5>
+                        <select name="sire" id="newCowSire" class="form-control">
+                            {% for cowi in cows %}
+                                {% if cowi.sex == "Bull" %}
+                                    <option>{{cowi.tag_number}}</option>
+                                {% endif %}
+                                {% endfor %}
+                                <option value="">N/A</option>
+                        </select>
+                        <input name="dam" value="{{cow.tag_number}}" hidden/>
+                        {% else %}
+                        <h5>Dam:</h5>
+                        <select name="dam" id="newCowDam" class="form-control">
+                            {% for cowi in cows %}
+                                {% if cowi.sex in ["Heifer", "Cow"] %}
+                                    <option>{{cowi.tag_number}}</option>
+                                {% endif %}
+                                {% endfor %}
+                                <option value="">N/A</option>
+                        </select>
+                        <input name="dam" value="{{cow.tag_number}}" hidden/>
+                        {% endif %}
+
+                        <h5>Tag Number:</h5>
+                        <input type="text" name="tag_number" id="newCowTagNumber" class="form-control">
+                        <small id="tagAvailabilityText" class="form-text">     
+                        </small>
+                        <h5>Owner:</h5>
+                        <input name="owner" id="newCowOwner" type="text" class="form-control" />
+                        <h5>Sex:</h5>
+                        <select name="sex" id="newCowSex" class="form-control">
+                            <option>Bull</option>
+                            <option>Cow</option>
+                            <option>Steer</option>
+                            <option>Heifer</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="submit" form="newCowForm" class="btn btn-primary" value="Add"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

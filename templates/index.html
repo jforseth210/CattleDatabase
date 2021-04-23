@@ -11,9 +11,6 @@
         <th>Dam</th>
         <th>Sire</th>
         <th>Calves</th>
-<!--        <th>Report</th>
-        <th>Add Event</th>
-        <th>Delete Cow</th>-->
         </tr>
         {% for cow in cows %}
         <tr >
@@ -42,65 +39,6 @@
         {% endfor %}
     </table>
     <button class="m-2 btn btn-success" data-toggle="modal" data-target="#newCowModal">Add Cow</button>
-    <!-- Modal -->
-    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">View Report</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <ul class="mb-3 nav nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="events-tab" data-toggle="tab" href="#events" role="tab"
-                                aria-controls="home" aria-selected="true">Events</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="finances-tab" data-toggle="tab" href="#finances" role="tab"
-                                aria-controls="profile" aria-selected="false">Finances</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="something-else-tab" data-toggle="tab" href="#something-else"
-                                role="tab" aria-controls="contact" aria-selected="false">Something Else</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="events" role="tabpanel" aria-labelledby="events-tab">
-                            <div class=container>
-                                <h5 id="reportEventsCowNumber">123:</h5>
-                                <table id="reportEventTable" class="table">
-                                </table>
-                                <button class="btn btn-success" data-toggle="modal" data-target="#newEventModal">Add
-                                    Event</button>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="finances" role="tabpanel" aria-labelledby="profile-tab">
-                            <div class=container>
-                                <h5 id="reportFinancesCowNumber">123:</h5>
-                                <table id="reportFinanceTable" class="table">
-                                  
-                                </table>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="something-else" role="tabpanel" aria-labelledby="contact-tab">
-                            <div class=container>
-                                <p>I'm not sure where else to put here...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal fade" id="newCowModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -112,7 +50,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="newCowForm" method="post" action="/newCow">
+                    <form id="newCowForm" method="post" action="/newCow" onsubmit="event.preventDefault();validateTagNumber(document.getElementById('newCowTagNumber'))">
                         <h5>Dam:</h5>
                         <select name="dam" id="newCowDam" class="form-control">
                             {% for cow in cows %}
@@ -133,6 +71,8 @@
                         </select>
                         <h5>Tag Number:</h5>
                         <input type="text" name="tag_number" id="newCowTagNumber" class="form-control">
+                        <small id="tagAvailabilityText" class="form-text">     
+                        </small>
                         <h5>Owner:</h5>
                         <input name="owner" id="newCowOwner" type="text" class="form-control" />
                         <h5>Sex:</h5>

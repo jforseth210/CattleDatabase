@@ -1,5 +1,5 @@
 from main import *
-calf = Cow.query.filter_by(tag_number="002").first()
-calf.dam_id = Cow.query.filter_by(tag_number="<>801").first().cow_id
-calf.sire_id = Cow.query.filter_by(tag_number="Fred").first().cow_id
+cow = Cow.query.filter_by(tag_number='814').first()
+cow.events.append(Event(date="2018-01-01", name="Born", description="Born"))
+cow.events.append(Event(date="2018-06-02", name="Branded", description="Branded"))
 db.session.commit()
