@@ -69,7 +69,18 @@ def get_cow_from_tag(tag):
 @app.route("/")
 def home():
     cows = Cow.query.all()
-    return render_template("index.html", cows=cows)
+    return redirect("/cows")
+
+@app.route("/cows")
+def cows():
+    cows = Cow.query.all()
+    return render_template("cows.html", cows=cows)
+
+@app.route("/events")
+def events():
+    events = Event.query.all()
+    cows = Cow.query.all()
+    return render_template("events.html", events=events, cows=cows)
 
 @app.route("/cow/<tag_number>")
 def showCow(tag_number):

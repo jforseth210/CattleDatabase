@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title%}Cattle Records{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <table class=table>
+        </tr>
+        <th>Cow</th>
+        <th>Born</th>
+        <th>Owner</th>
+        <th>Sex</th>
+        <th>Dam</th>
+        <th>Sire</th>
+        <th>Calves</th>
+        </tr>
+        {% for cow in cows %}
+        <tr class="clickable-tr" onclick="window.location.href = '/cow/{{cow.tag_number}}';">
+            <td class="w-25">
+                <h7>{{ cow.tag_number }}<h7>
+            </td>
+            <td>
+                <h7>{{ cow.get_birthdate() }}<h7>
+            </td>
+            <td>
+                <h7>{{ cow.owner }}<h7>
+            </td>
+            <td>
+                <h7>{{ cow.sex }}<h7>
+            </td>
+            <td>
+                <h7>{{ cow.get_dam().tag_number }}</h7>
+            </td>
+            <td>
+                <h7>{{ cow.get_sire().tag_number }}</h7>
+            </td>
+            <td>
+                <h7>{% for calf in cow.get_calves() %} {{calf.tag_number}}{% if not loop.last %}, {% endif %}{% endfor %}</h7>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#newCowModal">Add Cow</button>
+    <div class="modal fade" id="newCowModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Cow</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="newCowForm" method="post" action="/newCow" onsubmit="event.preventDefault();validateTagNumber(document.getElementById('newCowTagNumber'))">
+                        <h5>Dam:</h5>
+                        <select name="dam" id="newCowDam" class="form-control">
+                            {% for cow in cows %}
+                                {% if cow.sex in ["Heifer", "Cow"] %}
+                                    <option>{{cow.tag_number}}</option>
+                                {% endif %}
+                                {% endfor %}
+                                <option value="">N/A</option>
+                        </select>
+                        <h5>Sire:</h5>
+                        <select name="sire" id="newCowSire" class="form-control">
+                            {% for cow in cows %}
+                                {% if cow.sex == "Bull" %}
+                                    <option>{{cow.tag_number}}</option>
+                                {% endif %}
+                                {% endfor %}
+                                <option value="">N/A</option>
+                        </select>
+                        <h5>Tag Number:</h5>
+                        <input type="text" name="tag_number" id="newCowTagNumber" class="form-control">
+                        <small id="tagAvailabilityText" class="form-text">     
+                        </small>
+                        <h5>Owner:</h5>
+                        <input name="owner" id="newCowOwner" type="text" class="form-control" />
+                        <h5>Sex:</h5>
+                        <select name="sex" id="newCowSex" class="form-control">
+                            <option>Bull</option>
+                            <option>Cow</option>
+                            <option>Steer</option>
+                            <option>Heifer</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="submit" form="newCowForm" class="btn btn-primary" value="Add"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+
+
+</script>
+{% endblock %}
