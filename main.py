@@ -1,5 +1,5 @@
 import json
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, Markup
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -51,6 +51,14 @@ class Cow(db.Model):
             if event.name == "Born":
                 return event.date
 
+    def search(self, query):
+        if query.lower() in repr(self).lower():
+            return SearchResult(self.tag_number, repr(self).replace(query, f"<b>{query}</b>"), f"/cow/{self.tag_number}")
+
+    def __repr__(self):
+        return f"Cow with {self.tag_number}: {self.sex} owned by {self.owner}"
+
+
 class Event(db.Model):
     event_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String(10))
@@ -60,27 +68,60 @@ class Event(db.Model):
     def get_cows(self):
         return self.cows
 
+    def search(self, query):
+        if query.lower() in repr(self).lower():
+            return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/event/{self.event_id}")
+
+    def __repr__(self):
+        return f"Event on {self.date}: {self.name} - {self.description}"
+
+
+class SearchResult():
+    def __init__(self, title, body, url):
+        self.title = title
+        self.body = Markup(body)
+        self.url = url
+        print(title, body, url)
+
+
 def get_cows():
     return Cow.query.all()
 
+
 def get_cow_from_tag(tag):
     return Cow.query.filter_by(tag_number=tag).first()
+
 
 @app.route("/")
 def home():
     cows = Cow.query.all()
     return redirect("/cows")
 
+
 @app.route("/cows")
 def cows():
     cows = Cow.query.all()
     return render_template("cows.html", cows=cows)
+
 
 @app.route("/events")
 def events():
     events = Event.query.all()
     cows = Cow.query.all()
     return render_template("events.html", events=events, cows=cows)
+
+
+@app.route("/search")
+def search():
+    query = request.args.get("q")
+    cows = Cow.query.all()
+    events = Event.query.all()
+    cow_results = [cow.search(query) for cow in cows if cow.search(query)]
+    event_results = [event.search(query)
+                     for event in events if event.search(query)]
+    results = cow_results + event_results
+    return render_template("search.html", query=query, results=results)
+
 
 @app.route("/cow/<tag_number>")
 def showCow(tag_number):
@@ -89,10 +130,12 @@ def showCow(tag_number):
         return redirect("/")
     return render_template("cow.html", cow=cow, cows=get_cows())
 
+
 @app.route("/cowexists/<tag_number>")
 def cow_exists(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     return "True" if cow else "False"
+
 
 @app.route("/newCow", methods=["POST"])
 def new_cow():
@@ -114,10 +157,11 @@ def new_cow():
     db.session.commit()
     return redirect("/")
 
+
 @app.route("/newEvent", methods=["POST"])
 def new_event():
     tag = request.form.get('tag_number')
-    
+
     if tag:
         cows = [tag]
     else:
@@ -127,10 +171,10 @@ def new_event():
     name = request.form.get('name')
     description = request.form.get('description')
     new_event_object = Event(
-        date = date,
-        name = name, 
-        description = description, 
-        cows = [get_cow_from_tag(tag) for tag in cows]
+        date=date,
+        name=name,
+        description=description,
+        cows=[get_cow_from_tag(tag) for tag in cows]
     )
 
     db.session.add(new_event_object)
