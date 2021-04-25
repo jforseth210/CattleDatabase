@@ -110,8 +110,31 @@ def new_cow():
         tag_number=tag_number
     )
 
-    #db.session.add(new_cow)
-    #db.session.commit()
+    db.session.add(new_cow_object)
+    db.session.commit()
+    return redirect("/")
+
+@app.route("/newEvent", methods=["POST"])
+def new_event():
+    tag = request.form.get('tag_number')
+    
+    if tag:
+        cows = [tag]
+    else:
+        cows = request.form.getlist('cows')
+        print(type(cows))
+    date = request.form.get('date')
+    name = request.form.get('name')
+    description = request.form.get('description')
+    new_event_object = Event(
+        date = date,
+        name = name, 
+        description = description, 
+        cows = [get_cow_from_tag(tag) for tag in cows]
+    )
+
+    db.session.add(new_event_object)
+    db.session.commit()
     return redirect("/")
 
 
