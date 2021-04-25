@@ -57,9 +57,9 @@ content %}
                 <th>Calves</th>
                 </tr>
                 {% for calf in cow.get_calves() %}
-                <tr >
+        <tr class="clickable-tr" onclick="window.location.href = '/cow/{{calf.tag_number}}';">
                     <td class="w-25">
-                        <h7><a href="/cow/{{calf.tag_number}}">{{ calf.tag_number }}</a><h7>
+                        <h7>{{ calf.tag_number }}</h7>
                     </td>
                     <td>
                         <h7>{{ calf.get_birthdate() }}<h7>
@@ -95,7 +95,7 @@ content %}
                 <th>Description</th>      
                 </tr>
                 {% for event in cow.events %}
-                <tr >
+        <tr class="clickable-tr" onclick="window.location.href = '/event/{{event.event_id}}';">
                     <td class="w-25">
                         <h7>{{event.date}}<h7>
                     </td>
