@@ -4,8 +4,7 @@ content %}
   <div class="row">
     <div class="col-md-4">
         <div class="card">
-            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.elTpLVI3yCYJKV4xWWM-JwHaE7%26pid%3DApi&f=1" alt="Red Angus Cow" class="card-img-top">
-            <small><i>This isn't {{cow.tag_number}}, I just thought a picture would look good here.</i></small>
+            <img src="/static/brands/{{cow.owner}}.png" alt="{{cow.owner}}'s brand" class="card-img-top p-5">
             <div class="card-body">
                 <h2 class="card-title">{{cow.tag_number}}</h2>
                 <small><i>System Id: #000{{cow.cow_id}}</i></small>
