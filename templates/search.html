@@ -6,12 +6,17 @@
     <ul>
         {% for result in results %}
             <li>
-                <h3>
+                <h4>
                     <a href="{{result.url}}">{{result.title}}</a>
-                </h3>
+                </h4>
                 <p>{{result.body}}</p>
             </li>
         {% endfor %}
     </ul>
+    {% if not results %}
+    <h4>We didn't find any results for {{query}}</h4>
+    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#newCowModal">Add Cow</button>
+    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#newEventModal">Add Event</button>
+    {% endif %}
 </div>
 {% endblock %}

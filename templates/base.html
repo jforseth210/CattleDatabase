@@ -15,7 +15,7 @@
       integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="/static/style.css"/>
+    <link rel="stylesheet" href="/static/style.css" />
     <title>{% block title %}{% endblock %}</title>
   </head>
 
@@ -38,13 +38,13 @@
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
             <a class="nav-link" href="/cows"
-              >Cows<span class="sr-only"></span></a
-            >
+              >Cows<span class="sr-only"></span
+            ></a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/events"
-              >Events<span class="sr-only"></span></a
-            >
+              >Events<span class="sr-only"></span
+            ></a>
           </li>
         </ul>
         <form class="form-inline my-2 my-lg-0" action="/search">
@@ -62,6 +62,154 @@
       </div>
     </nav>
     {% block content %} {% endblock %}
+    <div
+      class="modal fade"
+      id="newCowModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add Cow</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form
+              id="newCowForm"
+              method="post"
+              action="/newCow"
+              onsubmit="event.preventDefault();validateTagNumber(document.getElementById('newCowTagNumber'))"
+            >
+              <h5>Dam:</h5>
+              <select name="dam" id="newCowDam" class="form-control">
+                {% for cow in cows %} {% if cow.sex in ["Heifer", "Cow"] %}
+                <option>{{cow.tag_number}}</option>
+                {% endif %} {% endfor %}
+                <option value="">N/A</option>
+              </select>
+              <h5>Sire:</h5>
+              <select name="sire" id="newCowSire" class="form-control">
+                {% for cow in cows %} {% if cow.sex == "Bull" %}
+                <option>{{cow.tag_number}}</option>
+                {% endif %} {% endfor %}
+                <option value="">N/A</option>
+              </select>
+              <h5>Tag Number:</h5>
+              <input
+                type="text"
+                name="tag_number"
+                id="newCowTagNumber"
+                class="form-control"
+              />
+              <small id="tagAvailabilityText" class="form-text"> </small>
+              <h5>Owner:</h5>
+              <input
+                name="owner"
+                id="newCowOwner"
+                type="text"
+                class="form-control"
+              />
+              <h5>Sex:</h5>
+              <select name="sex" id="newCowSex" class="form-control">
+                <option>Bull</option>
+                <option>Cow</option>
+                <option>Steer</option>
+                <option>Heifer</option>
+              </select>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <input
+              type="submit"
+              form="newCowForm"
+              class="btn btn-primary"
+              value="Add"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="newEventModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add Event</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="newEventForm" method="post" action="/newEvent">
+              <h5>Cows</h5>
+              {% for cow in cows %}
+              <div class="form-check form-check-inline">
+                <input
+                  name="cows"
+                  id="{{cow.cow_id}}"
+                  class="form-check-input"
+                  type="checkbox"
+                  value="{{cow.tag_number}}"
+                />
+                <label for="{{cow.cow_id}}" class="" for="flexCheckDefault">
+                  {{cow.tag_number}}
+                </label>
+              </div>
+              {% endfor %}
+              <h5>Date</h5>
+              <input name="date" type="date" class="form-control" />
+              <h5>Name</h5>
+              <input name="name" type="text" class="form-control" />
+              <h5>Description</h5>
+              <textarea name="description" class="form-control"></textarea>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <input
+              type="submit"
+              form="newEventForm"
+              class="btn btn-primary"
+              value="Add"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script
@@ -80,36 +228,35 @@
       crossorigin="anonymous"
     ></script>
     <script>
-        function validateTagNumber(field) {
-            console.log("Checking if " + field.value + " available");
-          const Http = new XMLHttpRequest();
-          const url = "/cowexists/" + field.value;
-          Http.open("GET", url);
-          Http.send();
-          Http.onreadystatechange = (e) => {
-              if (field.value == ""){
-                let message = document.getElementById("tagAvailabilityText")
-                message.innerHTML = "Tag number can't be blank"
-                message.classList.remove("text-success")
-                message.classList.add("text-danger")
-                return false;
-              }
-            else if (Http.responseText == "True") {
-                let message = document.getElementById("tagAvailabilityText")
-                message.innerHTML = field.value + " isn't available."
-                message.classList.remove("text-success")
-                message.classList.add("text-danger")
-                return false;
-            } else if (Http.responseText == "False"){
-                let message = document.getElementById("tagAvailabilityText")
-                message.innerHTML = field.value + " is available."
-                message.classList.remove("text-danger")
-                message.classList.add("text-success")
-                return true;
-            }
-          };
+      function validateTagNumber(field) {
+        console.log("Checking if " + field.value + " available");
+        const Http = new XMLHttpRequest();
+        const url = "/cowexists/" + field.value;
+        Http.open("GET", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+          if (field.value == "") {
+            let message = document.getElementById("tagAvailabilityText");
+            message.innerHTML = "Tag number can't be blank";
+            message.classList.remove("text-success");
+            message.classList.add("text-danger");
+            return false;
+          } else if (Http.responseText == "True") {
+            let message = document.getElementById("tagAvailabilityText");
+            message.innerHTML = field.value + " isn't available.";
+            message.classList.remove("text-success");
+            message.classList.add("text-danger");
+            return false;
+          } else if (Http.responseText == "False") {
+            let message = document.getElementById("tagAvailabilityText");
+            message.innerHTML = field.value + " is available.";
+            message.classList.remove("text-danger");
+            message.classList.add("text-success");
+            return true;
+          }
         };
-        
+      }
+
       document
         .getElementById("newCowTagNumber")
         .addEventListener("input", function () {
