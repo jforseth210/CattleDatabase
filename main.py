@@ -51,24 +51,20 @@ class Cow(db.Model):
             if event.name == "Born":
                 return event.date
 
-
 class Event(db.Model):
     event_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String(10))
     name = db.Column(db.String(100))
     description = db.Column(db.Text)
 
-    def get_cows():
+    def get_cows(self):
         return self.cows
-
 
 def get_cows():
     return Cow.query.all()
 
-
 def get_cow_from_tag(tag):
     return Cow.query.filter_by(tag_number=tag).first()
-
 
 @app.route("/")
 def home():
@@ -95,7 +91,7 @@ def new_cow():
     owner = request.form.get('owner')
     sex = request.form.get('sex')
 
-    new_cow = Cow(
+    new_cow_object = Cow(
         dam_id=get_cow_from_tag(dam_tag).cow_id if dam_tag else "",
         sire_id=get_cow_from_tag(sire_tag).cow_id if sire_tag else "",
         owner=owner,
