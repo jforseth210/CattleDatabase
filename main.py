@@ -94,7 +94,6 @@ def get_cow_from_tag(tag):
 
 @app.route("/")
 def home():
-    cows = Cow.query.all()
     return redirect("/cows")
 
 
