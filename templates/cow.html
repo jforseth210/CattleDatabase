@@ -19,8 +19,8 @@ content %}
                 </li>
                 {% endif %} {% if cow.sire_id %}
                 <li>
-                  <a href="/cow/{{cow.get_dam().tag_number}}"
-                    >Dam: {{cow.get_dam().tag_number}}</a
+                  <a href="/cow/{{cow.get_sire().tag_number}}"
+                    >Sire: {{cow.get_sire().tag_number}}</a
                   >
                 </li>
                 {% endif %}
