@@ -47,13 +47,16 @@
             ></a>
           </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0" action="/search">
+        <form id="search-form" class="form-inline my-2 my-lg-0" action="/search">
           <input
             name="q"
             class="form-control mr-sm-2"
             type="search"
             placeholder="Search"
             aria-label="Search"
+            {% if query %}
+            value="{{query}}"
+            {% endif %}
           />
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
             Search
@@ -88,7 +91,7 @@
               id="newCowForm"
               method="post"
               action="/newCow"
-              onsubmit="event.preventDefault();validateTagNumber(document.getElementById('newCowTagNumber'))"
+              onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))"
             >
               <h5>Dam:</h5>
               <select name="dam" id="newCowDam" class="form-control">
@@ -105,13 +108,13 @@
                 <option value="">N/A</option>
               </select>
               <h5>Tag Number:</h5>
+              <small id="tagAvailabilityText" class="form-text"> </small>
               <input
                 type="text"
                 name="tag_number"
                 id="newCowTagNumber"
                 class="form-control"
               />
-              <small id="tagAvailabilityText" class="form-text"> </small>
               <h5>Owner:</h5>
               <input
                 name="owner"

@@ -1,22 +1,142 @@
-{% extends 'base.html' %}
-{% block title%}Search results for {{query}}{% endblock %}
-{% block content %}
-<div class="container">
-    <h2>Search results for "{{ query }}":</h2>
-    <ul>
-        {% for result in results %}
-            <li>
-                <h4>
-                    <a href="{{result.url}}">{{result.title}}</a>
-                </h4>
-                <p>{{result.body}}</p>
-            </li>
+{% extends 'base.html' %} {% block title%}  {{results|length}} results found for {{query}}{%
+endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3 px-5">
+      <div class="card p-3">
+        <h4>Filter Results:</h4>
+        <h5>Tag Number</h5>
+        {% for tag in all_tags %}
+        <div class="form-check">
+          <input
+            type="checkbox"
+            id="tagFilterCheck{{tag}}"
+            class="form-check-input"
+            name="tag"
+            value="{{tag}}"
+            {% if checked_tags and tag in checked_tags%}
+            checked=true
+            {%endif%}
+            form="search-form"
+            onchange="this.form.submit()"
+          />
+          <label class="form-check-label" for="tagFilterCheck{{tag}}"
+            >{{tag}}{% if tag != "N/A" %}**{% endif %}</label
+          >
+        </div>
         {% endfor %}
-    </ul>
-    {% if not results %}
-    <h4>We didn't find any results for {{query}}</h4>
-    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#newCowModal">Add Cow</button>
-    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#newEventModal">Add Event</button>
-    {% endif %}
+        <h5 class="pt-3">Sex</h5>
+        {% for sex in all_sexes %}
+        <div class="form-check">
+          <input
+            type="checkbox"
+            id="tagFilterCheck{{sex}}"
+            class="form-check-input"
+            name="sex"
+            value="{{sex}}"
+            {% if checked_sexes and sex in checked_sexes%}
+            checked=true
+            {%endif%}
+            form="search-form"
+            onchange="this.form.submit()"
+          />
+          <label class="form-check-label" for="tagFilterCheck{{sex}}"
+            >{{sex}}</label
+          >
+        </div>
+        {% endfor %}
+        <h5 class="pt-3">Owner</h5>
+        {% for owner in all_owners %}
+        <div class="form-check">
+          <input
+            type="checkbox"
+            id="tagFilterCheck{{owner}}"
+            class="form-check-input"
+            name="owner"
+            value="{{owner}}"
+            {% if checked_owners and owner in checked_owners%}
+            checked=true
+            {%endif%}
+            form="search-form"
+            onchange="this.form.submit()"
+          />
+          <label class="form-check-label" for="tagFilterCheck{{owner}}"
+            >{{owner}}</label
+          >
+        </div>
+        {% endfor %}
+        <h5 class="pt-3">Date</h5>
+        {% for date in all_dates %}
+        <div class="form-check">
+          <input
+            type="checkbox"
+            id="tagFilterCheck{{date}}"
+            class="form-check-input"
+            name="date"
+            value="{{date}}"
+            {% if checked_dates and date in checked_dates%}
+            checked=true
+            {%endif%}
+            form="search-form"
+            onchange="this.form.submit()"
+          />
+          <label class="form-check-label" for="tagFilterCheck{{date}}"
+            >{{date}}</label
+          >
+        </div>
+        {% endfor %}
+        <h5 class="pt-3">Name</h5>
+        {% for name in all_names %}
+        <div class="form-check">
+          <input
+            type="checkbox"
+            id="tagFilterCheck{{name}}"
+            class="form-check-input"
+            name="name"
+            value="{{name}}"
+            {% if checked_names and name in checked_names%}
+            checked=true
+            {%endif%}
+            form="search-form"
+            onchange="this.form.submit()"
+          />
+          <label class="form-check-label" for="tagFilterCheck{{name}}"
+            >{{name}}</label
+          >
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="col-sm-9">
+      <h2>{{results|length}} result{% if results|length > 1%}s{%endif%} found for {{query}}:</h2>
+      <ul>
+        {% for result in results %}
+        <li>
+          <h4>
+            <a href="{{result.url}}">{{result.title}}</a>
+          </h4>
+          <p>{{result.body}}</p>
+        </li>
+        {% endfor %}
+      </ul>
+      {% if not results %}
+      <h4>We didn't find any results for {{query}}</h4>
+      <button
+        class="m-2 btn btn-success"
+        data-toggle="modal"
+        data-target="#newCowModal"
+      >
+        Add Cow
+      </button>
+      <button
+        class="m-2 btn btn-success"
+        data-toggle="modal"
+        data-target="#newEventModal"
+      >
+        Add Event
+      </button>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}
