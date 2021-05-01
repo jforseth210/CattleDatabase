@@ -54,7 +54,8 @@ class Cow(db.Model):
     def get_first_digit_of_tag(self):
         first_digit = re.search("\d", self.tag_number)
         first_digit = first_digit.group()[0] if first_digit else "N/A"
-    
+        return first_digit
+        
     def __repr__(self):
         return f"{self.sex} with tag {self.tag_number} owned by {self.owner}"
 

@@ -12,10 +12,6 @@ db.init_app(app)
 def get_cow_from_tag(tag):
     return Cow.query.filter_by(tag_number=tag).first()
 
-def get_first_digit_of_tag(tag_number):
-    first_digit = re.search("\d", tag_number)
-    first_digit = first_digit.group()[0] if first_digit else "N/A"
-    return first_digit
 
 @app.route("/")
 def home():
@@ -38,7 +34,7 @@ def events():
 @app.route("/search")
 def search():
     query = request.args.get("q")
-
+    checked_types = request.args.getlist("type")
     checked_tags = request.args.getlist("tag")
     checked_sexes = request.args.getlist("sex")
     checked_owners = request.args.getlist("owner")
@@ -54,7 +50,7 @@ def search():
     all_sexes = set()
     all_owners = set()
     for cow in cows:
-        all_tags.add(get_first_digit_of_tag(cow.tag_number))
+        all_tags.add(cow.get_first_digit_of_tag())
         all_sexes.add(cow.sex)
         all_owners.add(cow.owner)
     
@@ -64,9 +60,9 @@ def search():
         all_dates.add(event.date)
         all_names.add(event.name)
 
-    if checked_tags or checked_sexes or checked_owners:
+    if checked_tags or checked_sexes or checked_owners or "Event" not in checked_types:
         events = []
-    if checked_dates or checked_names:
+    if checked_dates or checked_names or "Cow" not in checked_types:
         cows = []
 
     if checked_tags:
@@ -90,6 +86,8 @@ def search():
     return render_template("search.html",
                            query=query,
                            results=results,
+                           all_types=["Cow","Event"],
+                           checked_types=checked_types,
                            all_tags=all_tags, 
                            checked_tags=checked_tags, 
                            all_sexes=all_sexes, 
@@ -139,7 +137,7 @@ def new_cow():
 
 
 @ app.route("/newEvent", methods=["POST"])
-def new_event():
+def new_event():  # sourcery skip: assign-if-exp
     tag = request.form.get('tag_number')
 
     if tag:
