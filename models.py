@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import Markup
+import re
 db = SQLAlchemy()
 
 calendar = db.Table('calendar',
@@ -49,7 +50,11 @@ class Cow(db.Model):
     def search(self, query):
         if query.lower() in repr(self).lower():
             return SearchResult(self.tag_number, repr(self).replace(query, f"<b>{query}</b>"), f"/cow/{self.tag_number}")
-
+    
+    def get_first_digit_of_tag(self):
+        first_digit = re.search("\d", self.tag_number)
+        first_digit = first_digit.group()[0] if first_digit else "N/A"
+    
     def __repr__(self):
         return f"{self.sex} with tag {self.tag_number} owned by {self.owner}"
 

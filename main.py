@@ -9,11 +9,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-
-def get_cows():
-    return Cow.query.all()
-
-
 def get_cow_from_tag(tag):
     return Cow.query.filter_by(tag_number=tag).first()
 
@@ -43,6 +38,7 @@ def events():
 @app.route("/search")
 def search():
     query = request.args.get("q")
+
     checked_tags = request.args.getlist("tag")
     checked_sexes = request.args.getlist("sex")
     checked_owners = request.args.getlist("owner")
@@ -74,7 +70,7 @@ def search():
         cows = []
 
     if checked_tags:
-        cows = [cow for cow in cows if get_first_digit_of_tag(cow.tag_number) in checked_tags]
+        cows = [cow for cow in cows if cow.get_first_digit_of_tag() in checked_tags]
     if checked_sexes:
         cows = [cow for cow in cows if cow.sex in checked_sexes]
     if checked_owners:
@@ -112,7 +108,7 @@ def showCow(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     if not cow:
         return redirect("/")
-    return render_template("cow.html", cow=cow, cows=get_cows())
+    return render_template("cow.html", cow=cow, cows=Cow.query.all())
 
 
 @ app.route("/cowexists/<tag_number>")
