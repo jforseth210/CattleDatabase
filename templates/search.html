@@ -6,28 +6,28 @@ endblock %} {% block content %}
       <div class="card p-3">
         <h4>Filter Results:</h4>
         <h5 class="pt-3">Type</h5>
-        {% for type in all_types %}
+        {% for type in unique_values["types"] %}
         <div class="form-check">
           <input
             type="checkbox"
-            id="tagFilterCheck{{type}}"
+            id="typeFilterCheck{{type}}"
             class="form-check-input"
             name="type"
             value="{{type}}"
-            {% if checked_types and type in checked_types%}
+            {% if checked_values["types"] and type in checked_values["types"]%}
             checked=true
             {%endif%}
             form="search-form"
             onchange="this.form.submit()"
           />
-          <label class="form-check-label" for="tagFilterCheck{{type}}"
+          <label class="form-check-label" for="typeFilterCheck{{type}}"
             >{{type}}</label
           >
         </div>
         {% endfor %}
-        {% if not checked_types or "Cow" in checked_types %}
+        {% if not checked_values["types"] or "Cow" in checked_values["types"] %}
         <h5>Tag Number</h5>
-        {% for tag in all_tags %}
+        {% for tag in unique_values["tags"] %}
         <div class="form-check">
           <input
             type="checkbox"
@@ -35,7 +35,7 @@ endblock %} {% block content %}
             class="form-check-input"
             name="tag"
             value="{{tag}}"
-            {% if checked_tags and tag in checked_tags%}
+            {% if checked_values["tags"] and tag in checked_values["tags"]%}
             checked=true
             {%endif%}
             form="search-form"
@@ -47,83 +47,123 @@ endblock %} {% block content %}
         </div>
         {% endfor %}
         <h5 class="pt-3">Sex</h5>
-        {% for sex in all_sexes %}
+        {% for sex in unique_values["sexes"] %}
         <div class="form-check">
           <input
             type="checkbox"
-            id="tagFilterCheck{{sex}}"
+            id="sexFilterCheck{{sex}}"
             class="form-check-input"
             name="sex"
             value="{{sex}}"
-            {% if checked_sexes and sex in checked_sexes%}
+            {% if checked_values["sexes"] and sex in checked_values["sexes"]%}
             checked=true
             {%endif%}
             form="search-form"
             onchange="this.form.submit()"
           />
-          <label class="form-check-label" for="tagFilterCheck{{sex}}"
+          <label class="form-check-label" for="sexFilterCheck{{sex}}"
             >{{sex}}</label
           >
         </div>
         {% endfor %}
         <h5 class="pt-3">Owner</h5>
-        {% for owner in all_owners %}
+        {% for owner in unique_values["owners"] %}
         <div class="form-check">
           <input
             type="checkbox"
-            id="tagFilterCheck{{owner}}"
+            id="ownerFilterCheck{{owner}}"
             class="form-check-input"
             name="owner"
             value="{{owner}}"
-            {% if checked_owners and owner in checked_owners%}
+            {% if checked_values["owners"] and owner in checked_values["owners"]%}
             checked=true
             {%endif%}
             form="search-form"
             onchange="this.form.submit()"
           />
-          <label class="form-check-label" for="tagFilterCheck{{owner}}"
+          <label class="form-check-label" for="ownerFilterCheck{{owner}}"
             >{{owner}}</label
           >
         </div>
         {% endfor %}
-        {% endif %}
-        {% if not checked_types or "Event" in checked_types %}
-        <h5 class="pt-3">Date</h5>
-        {% for date in all_dates %}
+        <h5 class="pt-3">Sire</h5>
+        {% for sire in unique_values["sires"] %}
         <div class="form-check">
           <input
             type="checkbox"
-            id="tagFilterCheck{{date}}"
+            id="sireFilterCheck{{sire}}"
             class="form-check-input"
-            name="date"
-            value="{{date}}"
-            {% if checked_dates and date in checked_dates%}
+            name="sire"
+            value="{{sire}}"
+            {% if checked_values["sires"] and sire in checked_values["sires"]%}
             checked=true
             {%endif%}
             form="search-form"
             onchange="this.form.submit()"
           />
-          <label class="form-check-label" for="tagFilterCheck{{date}}"
+          <label class="form-check-label" for="sireFilterCheck{{sire}}"
+            >{{sire}}</label
+          >
+        </div>
+        {% endfor %}
+        <h5 class="pt-3">Dam</h5>
+        {% for dam in unique_values["dams"] %}
+        <div class="form-check">
+          <input
+            type="checkbox"
+            id="damFilterCheck{{dam}}"
+            class="form-check-input"
+            name="dam"
+            value="{{dam}}"
+            {% if checked_values["dams"] and dam in checked_values["dams"]%}
+            checked=true
+            {%endif%}
+            form="search-form"
+            onchange="this.form.submit()"
+          />
+          <label class="form-check-label" for="damFilterCheck{{dam}}"
+            >{{dam}}</label
+          >
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% if not checked_values["types"] or "Event" in checked_values["types"] %}
+        <h5 class="pt-3">Date</h5>
+        {% for date in unique_values["dates"] %}
+        <div class="form-check">
+          <input
+            type="checkbox"
+            id="dateFilterCheck{{date}}"
+            class="form-check-input"
+            name="date"
+            value="{{date}}"
+            {% if checked_values["dates"] and date in checked_values["dates"]%}
+            checked=true
+            {%endif%}
+            form="search-form"
+            onchange="this.form.submit()"
+          />
+          <label class="form-check-label" for="dateFilterCheck{{date}}"
             >{{date}}</label
           >
         </div>
         {% endfor %}
         <h5 class="pt-3">Name</h5>
-        {% for name in all_names %}
+        {% for name in unique_values["names"] %}
         <div class="form-check">
           <input
             type="checkbox"
-            id="tagFilterCheck{{name}}"
+            id="nameFilterCheck{{name}}"
             class="form-check-input"
             name="name"
             value="{{name}}"
-            {% if checked_names and name in checked_names%}
+            {% if checked_values["names"] and name in checked_values["names"]%}
             checked=true
             {%endif%}
             form="search-form"
             onchange="this.form.submit()"
           />
-          <label class="form-check-label" for="tagFilterCheck{{name}}"
+          <label class="form-check-label" for="nameFilterCheck{{name}}"
             >{{name}}</label
           >
         </div>

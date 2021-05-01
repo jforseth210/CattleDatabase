@@ -47,15 +47,21 @@ class Cow(db.Model):
             if event.name == "Born":
                 return event.date
 
-    def search(self, query):
-        if query.lower() in repr(self).lower():
-            return SearchResult(self.tag_number, repr(self).replace(query, f"<b>{query}</b>"), f"/cow/{self.tag_number}")
-    
+    def search(self, query, tags=[], sexes=[], owners=[], sires=[], dams=[]):
+        search_match = query.lower() in repr(self).lower() 
+        tag_match = not tags or self.get_first_digit_of_tag() in tags
+        sex_match = not sexes or self.sex in sexes
+        sire_match = not sires or self.get_sire().tag_number in sires
+        dam_match = not dams or self.get_dam().tag_number in dams
+        return search_match and tag_match and sex_match and sire_match and dam_match
+
+    def toSearchResult(self,query):
+        return SearchResult(self.tag_number, repr(self).replace(query, f"<b>{query}</b>"), f"/cow/{self.tag_number}")
     def get_first_digit_of_tag(self):
         first_digit = re.search("\d", self.tag_number)
         first_digit = first_digit.group()[0] if first_digit else "N/A"
         return first_digit
-        
+
     def __repr__(self):
         return f"{self.sex} with tag {self.tag_number} owned by {self.owner}"
 
@@ -69,9 +75,13 @@ class Event(db.Model):
     def get_cows(self):
         return self.cows
 
-    def search(self, query):
-        if query.lower() in repr(self).lower():
-            return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/event/{self.event_id}")
+    def search(self, query, dates=[], names=[]):
+        query_match = query.lower() in repr(self).lower()
+        date_match = not dates or self.date in dates
+        name_match = not names or self.name in names
+        return query_match and date_match and name_match
+    def toSearchResult(self, query):
+        return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/event/{self.event_id}")
 
     def __repr__(self):
         return f"Event on {self.date}: {self.name} - {self.description}"

@@ -9,8 +9,39 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+
 def get_cow_from_tag(tag):
     return Cow.query.filter_by(tag_number=tag).first()
+
+
+def get_unique_cow_values():
+    cows = Cow.query.all()
+    tags = set()
+    sexes = set()
+    owners = set()
+    sires = set()
+    dams = set()
+
+    for cow in cows:
+        tags.add(cow.get_first_digit_of_tag())
+        sexes.add(cow.sex)
+        owners.add(cow.owner)
+        if cow.get_dam():
+            dams.add(cow.get_dam().tag_number)
+        if cow.get_sire():
+            sires.add(cow.get_sire().tag_number)
+    return {"tags": tags, "sexes": sexes, "owners": owners, "sires": sires, "dams": dams}
+
+
+def get_unique_event_values():
+    events = Event.query.all()
+
+    names = set()
+    dates = set()
+    for event in events:
+        names.add(event.name)
+        dates.add(event.date)
+    return {"names": names, "dates": dates}
 
 
 @app.route("/")
@@ -33,72 +64,68 @@ def events():
 
 @app.route("/search")
 def search():
+    # Arguments
     query = request.args.get("q")
-    checked_types = request.args.getlist("type")
-    checked_tags = request.args.getlist("tag")
-    checked_sexes = request.args.getlist("sex")
-    checked_owners = request.args.getlist("owner")
-    
-    checked_dates = request.args.getlist("date")
-    checked_names = request.args.getlist("name")
+    types = request.args.getlist("type")
+    # Cow arguments
+    tags = request.args.getlist("tag")
+    sexes = request.args.getlist("sex")
+    owners = request.args.getlist("owner")
+    sires = request.args.getlist("sire")
+    dams = request.args.getlist("dam")
+    # Event arguments
+    dates = request.args.getlist("date")
+    names = request.args.getlist("name")
 
-    cows = Cow.query.all()
-    events = Event.query.all()
+    # Package for jinja
+    checked_values = {
+        "types": types,
+        "tags": tags,
+        "sexes": sexes,
+        "owners": owners,
+        "sires": sires,
+        "dams": dams,
 
-    #Get unique values from each column
-    all_tags = set()
-    all_sexes = set()
-    all_owners = set()
-    for cow in cows:
-        all_tags.add(cow.get_first_digit_of_tag())
-        all_sexes.add(cow.sex)
-        all_owners.add(cow.owner)
-    
-    all_dates = set()
-    all_names = set()
-    for event in events:
-        all_dates.add(event.date)
-        all_names.add(event.name)
+        "names": names,
+        "dates": dates
+    }
 
-    if checked_tags or checked_sexes or checked_owners or "Event" not in checked_types:
-        events = []
-    if checked_dates or checked_names or "Cow" not in checked_types:
-        cows = []
+    # Get unique values from each column
+    unique_values = get_unique_cow_values()
+    unique_values.update(get_unique_event_values())
+    # Add the two types of object
+    unique_values["types"] = ["Cow", "Event"]
 
-    if checked_tags:
-        cows = [cow for cow in cows if cow.get_first_digit_of_tag() in checked_tags]
-    if checked_sexes:
-        cows = [cow for cow in cows if cow.sex in checked_sexes]
-    if checked_owners:
-        cows = [cow for cow in cows if cow.owner in checked_owners]
-    
-    if checked_dates:
-        events = [event for event in events if event.date in checked_dates]
-    if checked_names:
-        events = [event for event in events if event.name in checked_names]
+    events = []
+    cows = []
+    # If no cow specific parameters are checked, and events haven't been filtered out
+    if not (tags or sexes or owners or dams or sires or (types and "Event" not in types)):
+        events = Event.query.all()
 
-    cow_results = [cow.search(query) for cow in cows if cow.search(query)]
-    event_results = [event.search(query)
-                     for event in events if event.search(query)]
+    # If no event specific parameters are checked, and cows haven't been filtered out
+    if not (dates or names or (types and "Cow" not in types)):
+        cows = Cow.query.all()
 
+    # Run object.search() for each object, and if it returns true, convert it to a SearchResult and add it to a list
+    cow_results = [cow.toSearchResult(query) for cow in cows if cow.search(query, tags=tags, sexes=sexes, owners=owners,
+                                                                           sires=sires, dams=dams)]
+    event_results = [event.toSearchResult(query)
+                     for event in events if event.search(query, dates=dates, names=names)]
+
+    # Put the results together
     results = cow_results+event_results
 
+    # Send it
     return render_template("search.html",
+                           # What the user searched for
                            query=query,
+                           # The matching results
                            results=results,
-                           all_types=["Cow","Event"],
-                           checked_types=checked_types,
-                           all_tags=all_tags, 
-                           checked_tags=checked_tags, 
-                           all_sexes=all_sexes, 
-                           checked_sexes=checked_sexes,
-                           all_owners=all_owners,
-                           checked_owners=checked_owners,
-                           all_dates=all_dates,
-                           checked_dates=checked_dates, 
-                           all_names=all_names,
-                           checked_names=checked_names
-    )
+                           # The possible filter options
+                           unique_values=unique_values,
+                           # The selected filter options
+                           checked_values=checked_values
+                           )
 
 
 @ app.route("/cow/<tag_number>")
