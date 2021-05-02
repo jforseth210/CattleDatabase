@@ -160,7 +160,7 @@ def new_cow():
 
     db.session.add(new_cow_object)
     db.session.commit()
-    return redirect("/")
+    return redirect(request.referrer)
 
 
 @ app.route("/newEvent", methods=["POST"])
@@ -183,7 +183,7 @@ def new_event():  # sourcery skip: assign-if-exp
 
     db.session.add(new_event_object)
     db.session.commit()
-    return redirect("/")
+    return redirect(request.referrer)
 
 
 if __name__ == "__main__":
