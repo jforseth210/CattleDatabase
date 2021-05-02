@@ -179,6 +179,18 @@ content %}
                 <div class="modal-body">
                     <form id="newCowForm" method="post" action="/newCow"
                         onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))">
+                        <h5>Date:</h5>
+                        <input name="date" type="date" class="form-control"/>
+                        <div class="form-check">
+                            <input type="checkbox" name="born_event" id="born_event" class="form-check-input" checked>
+                            <label for="born_event" class="form-check-label">Add "born" event for calf</label>
+                        </div>
+                        {% if cow.sex in ["Cow", "Heifer"] %}
+                        <div class="form-check">
+                            <input type="checkbox" name="calved_event" id="calved_event" class="form-check-input" checked>
+                            <label for="calved_event" class="form-check-label">Add "calved" event for cow</label>
+                        </div>
+                        {% endif%}
                         {% if cow.sex in ["Cow", "Heifer"] %}
                         <h5>Sire:</h5>
                         <select name="sire" id="newCowSire" class="form-control">

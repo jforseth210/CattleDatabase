@@ -149,12 +149,17 @@ def cow_exists(tag_number):
 
 @ app.route("/newCow", methods=["POST"])
 def new_cow():
+    date = request.form.get('date')
+    born_event_enabled = request.form.get('born_event')
+    calved_event_enabled = request.form.get('calved_event')
     dam_tag = request.form.get('dam')
     sire_tag = request.form.get('sire')
     tag_number = request.form.get('tag_number')
     owner = request.form.get('owner')
     sex = request.form.get('sex')
-
+    
+    
+   
     new_cow_object = Cow(
         dam_id=get_cow_from_tag(dam_tag).cow_id if dam_tag else "",
         sire_id=get_cow_from_tag(sire_tag).cow_id if sire_tag else "",
@@ -162,6 +167,14 @@ def new_cow():
         sex=sex,
         tag_number=tag_number
     )
+
+    if born_event_enabled == 'on':
+        born_event = Event(date=date, name="Born", description=f"{dam_tag} gave birth to {tag_number}", cows=[new_cow_object])
+        db.session.add(born_event)
+
+    if calved_event_enabled == 'on':
+        calved_event = Event(date=date, name="Calved", description=f"{dam_tag} gave birth to {tag_number}", cows=[get_cow_from_tag(dam_tag)])
+        db.session.add(calved_event)
 
     db.session.add(new_cow_object)
     db.session.commit()
