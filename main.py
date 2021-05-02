@@ -140,7 +140,18 @@ def showEvent(event_id):
     event = Event.query.filter_by(event_id=event_id).first()
     if not event:
         return redirect("/events")
-    return render_template("event.html", event=event)
+    return render_template("event.html", event=event, cows=Cow.query.all())
+
+@app.route("/eventAddRemoveCows", methods=["POST"])
+def event_add_remove_cows():
+    cows = request.form.getlist("cow")
+    event_id = request.form.get("event")
+
+    event = Event.query.filter_by(event_id=event_id).first()
+    event.cows = [get_cow_from_tag(cow) for cow in cows]
+    db.session.commit()
+    return redirect(request.referrer)
+
 @ app.route("/cowexists/<tag_number>")
 def cow_exists(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
