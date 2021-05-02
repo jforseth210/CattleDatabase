@@ -163,8 +163,32 @@ def new_cow():
     return redirect(request.referrer)
 
 
+@app.route("/deletecow", methods=["POST"])
+def delete_cow():
+    tag_number = request.form.get("tag_number")
+    cow = Cow.query.filter_by(tag_number=tag_number).first()
+    db.session.delete(cow)
+    db.session.commit()
+    return redirect(request.referrer)
+
+@app.route("/transferOwnership", methods=["POST"])
+def transferOwnership():
+    tag_number = request.form.get("tag_number")
+    new_owner = request.form.get("newOwner")
+    date = request.form.get("date")
+    description = request.form.get("description")
+    
+    cow = Cow.query.filter_by(tag_number=tag_number).first()
+
+    sale_event = Event(date=date, name="Transfer", description=f"Transfer {cow.tag_number} from {cow.owner} to {new_owner}:\n{description}")
+    
+    cow.owner = new_owner
+    
+    db.session.add(sale_event)
+    db.session.commit()
+    return redirect(request.referrer)
 @ app.route("/newEvent", methods=["POST"])
-def new_event():  # sourcery skip: assign-if-exp
+def new_event():
     tag = request.form.get('tag_number')
 
     if tag:
