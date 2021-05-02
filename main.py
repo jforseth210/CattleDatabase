@@ -133,7 +133,7 @@ def showCow(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     if not cow:
         return redirect("/")
-    return render_template("cow.html", cow=cow, cows=Cow.query.all())
+    return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=Event.query.all())
 
 @app.route("/event/<event_id>")
 def showEvent(event_id):
