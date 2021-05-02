@@ -1,0 +1,65 @@
+{% extends 'base.html' %} {% block title%}Cattle Records{% endblock %} {% block
+content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{event.name}}</h2>
+                    <small><i>System Id: #000{{event.event_id}}</i></small>
+                    <ul>
+                        <li>Date: {{event.date}}</li>
+                        <li>Description: {{event.description}}</li>
+                    </ul>
+                    <form method="post" action="/deleteevent" class="p-0 m-2">
+                        <input name="event_id" value="{{event.event_id}}" hidden />
+                        <button type="submit" class="btn btn-danger">
+                            <!-- Trash icon-->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-trash" viewBox="0 0 16 16">
+                                <path
+                                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                <path fill-rule="evenodd"
+                                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                            </svg>
+                            Delete Event
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="cows-tab" data-toggle="tab" href="#cows" role="tab"
+                        aria-controls="cows" aria-selected="true">Cows</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="cows" role="tabpanel" aria-labelledby="cows-tab">
+                    <table class="table">
+                        <tr>
+                            <th>Tag Number</th>
+                            <th>Owner</th>
+                            <th>Sex</th>
+                        </tr>
+                        {% for cow in event.cows %}
+                        <tr>
+                            <td>
+                                <h7>{{cow.tag_number}}</h7>
+                            </td>
+                            <td>
+                                <h7>{{ cow.owner }}<h7>
+                            </td>
+                            <td>
+                                <h7>{{ cow.sex }}<h7>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
