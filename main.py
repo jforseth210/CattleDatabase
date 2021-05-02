@@ -59,9 +59,28 @@ def cows():
 def events():
     events = Event.query.all()
     cows = Cow.query.all()
-    return render_template("events.html", events=events, cows=cows)
 
+    dates = [event.date for event in events]
 
+    has_duplicates = len(dates) != len(set(dates))
+
+    return render_template("events.html", events=events, cows=cows, has_duplicates=has_duplicates)
+
+@app.route("/mergeEvents")
+def merge_events():
+    events = Event.query.all()
+    all_dates = [event.date for event in events]
+    dates_iterated_over = []
+    duplicated_dates = []
+    for date in all_dates:
+        if date in dates_iterated_over:
+            duplicated_dates.append(date)
+        dates_iterated_over.append(date)
+
+    duplicated_events = []
+    for date in duplicated_dates:
+        duplicated_events.append(Event.query.filter_by(date=date).all())
+    return render_template("mergeevents.html", duplicated_events=duplicated_events)
 @app.route("/search")
 def search():
     # Arguments

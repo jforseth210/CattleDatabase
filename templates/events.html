@@ -2,6 +2,12 @@
 {% block title%}Cattle Records{% endblock %}
 {% block content %}
 <div class="container-fluid">
+{% if has_duplicates %}
+<div class="alert alert-warning">
+    Duplicated events found. <a href="/mergeEvents">Merge Events</a>
+</div>
+{% endif %}
+</div>
 <table class=table>
 </tr>
 <th>Name</th>

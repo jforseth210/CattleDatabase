@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title%}Merge Events{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    {% for events in duplicated_events %}
+    <h5>Duplicate {{loop.index}}</h5>
+    <table class=table>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Cows</th>
+            <th>Date</th>
+        </tr>
+        {% for event in events|sort(attribute='date') %}
+        <tr class="clickable-tr" onclick="window.location.href = '/event/{{event.event_id}}';">
+            <td class="w-25">
+                <h7>{{event.name}}<h7>
+            </td>
+            <td class="w-25">
+                <h7>{{event.description}}<h7>
+            </td>
+            <td>
+                <h7>{% for cow in event.get_cows() %} {{cow.tag_number}}{% if not loop.last %}, {% endif %}{% endfor %}
+                </h7>
+            <td class="w-25">
+                <h7>{{event.date}}<h7>
+            </td>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>
+                <b>
+                    Suggestion:
+                </b>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h7>{% for event in events|sort(attribute='date')%}{% if loop.last %} and {% endif %}{{event.name}}{% if
+                    not loop.last + 1 %}, {% endif %}{%endfor%}</h7>
+            </td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    {% endfor %}
+</div>
+{% endblock %}
