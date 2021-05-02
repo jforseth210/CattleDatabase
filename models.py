@@ -51,9 +51,10 @@ class Cow(db.Model):
         search_match = query.lower() in repr(self).lower() 
         tag_match = not tags or self.get_first_digit_of_tag() in tags
         sex_match = not sexes or self.sex in sexes
-        sire_match = not sires or self.get_sire().tag_number in sires
-        dam_match = not dams or self.get_dam().tag_number in dams
-        return search_match and tag_match and sex_match and sire_match and dam_match
+        owner_match = not owners or self.owner in owners
+        sire_match = not sires or (self.get_sire() is not None and self.get_sire().tag_number in sires)
+        dam_match = not dams or (self.get_dam() is not None and self.get_dam().tag_number in dams)
+        return search_match and tag_match and sex_match and owner_match and sire_match and dam_match
 
     def toSearchResult(self,query):
         return SearchResult(self.tag_number, repr(self).replace(query, f"<b>{query}</b>"), f"/cow/{self.tag_number}")
