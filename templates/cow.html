@@ -94,7 +94,7 @@ content %}
                 <th>Name</th>
                 <th>Description</th>      
                 </tr>
-                {% for event in cow.events %}
+                {% for event in cow.events|sort(attribute='date') %}
         <tr class="clickable-tr" onclick="window.location.href = '/event/{{event.event_id}}';">
                     <td class="w-25">
                         <h7>{{event.date}}<h7>
@@ -124,7 +124,7 @@ content %}
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="newCowForm" method="post" action="/newCow" onsubmit="event.preventDefault();validateTagNumber(document.getElementById('newCowTagNumber'))">
+                    <form id="newCowForm" method="post" action="/newCow" onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))">
                         {% if cow.sex in ["Cow", "Heifer"] %}
                         <h5>Sire:</h5>
                         <select name="sire" id="newCowSire" class="form-control">
