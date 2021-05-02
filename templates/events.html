@@ -9,7 +9,7 @@
 <th>Cows</th>
 <th>Date</th>
 </tr>
-{% for event in events %}
+{% for event in events|sort(attribute='date') %}
         <tr class="clickable-tr" onclick="window.location.href = '/event/{{event.event_id}}';">
     <td class="w-25">
         <h7>{{event.name}}<h7>
