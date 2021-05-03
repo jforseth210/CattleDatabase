@@ -13,7 +13,7 @@
         <th>Calves</th>
         </tr>
         {% for cow in cows %}
-        <tr class="clickable-tr {% if cow.owner == "Death Loss"%}text-secondary{%endif%}" onclick="window.location.href = '/cow/{{cow.tag_number}}';">
+        <tr class="clickable-tr {% if cow.owner not in ["Justin", "Nolan", "Orville", "Clayt"]%}text-secondary{%endif%}" onclick="window.location.href = '/cow/{{cow.tag_number}}';">
             <td class="w-25">
                 <h7>{{ cow.tag_number }}<h7>
             </td>
