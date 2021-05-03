@@ -184,7 +184,7 @@ content %}
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="addToExistingEventModal" method="POST" action="/addCowToEvent">
+                    <form id="addToExistingEventForm" method="POST" action="/addCowToEvent">
                         <h5>Event</h5>
                         <select class="form-control" name="event">
                             {% for event in events %}
@@ -197,7 +197,7 @@ content %}
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         Close
                     </button>
-                    <input type="submit" form="transferForm" class="btn btn-primary" value="Transfer" />
+                    <input type="submit" form="addToExistingEventForm" class="btn btn-primary" value="Add to Event" />
                 </div>
             </div>
         </div>
