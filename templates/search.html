@@ -20,7 +20,7 @@
         {% endfor %} {% if not checked_values["types"] or "Cow" in
         checked_values["types"] %}
         <h5>Tag Number</h5>
-        {% for tag in unique_values["tags"] %}
+        {% for tag in unique_values["tags"]|sort %}
         <div class="form-check">
           <input type="checkbox" id="tagFilterCheck{{tag}}"
           class="form-check-input" name="tag" value="{{tag}}" {% if
@@ -46,7 +46,7 @@
         </div>
         {% endfor %}
         <h5 class="pt-3">Owner</h5>
-        {% for owner in unique_values["owners"] %}
+        {% for owner in unique_values["owners"]|sort %}
         <div class="form-check">
           <input type="checkbox" id="ownerFilterCheck{{owner}}"
           class="form-check-input" name="owner" value="{{owner}}" {% if
@@ -72,7 +72,7 @@
         </div>
         {% endfor %}
         <h5 class="pt-3">Dam</h5>
-        {% for dam in unique_values["dams"] %}
+        {% for dam in unique_values["dams"]|sort %}
         <div class="form-check">
           <input type="checkbox" id="damFilterCheck{{dam}}"
           class="form-check-input" name="dam" value="{{dam}}" {% if
@@ -93,7 +93,7 @@
             {% endfor %}
           </select>
         <h5 class="pt-3">Name</h5>
-        {% for name in unique_values["names"] %}
+        {% for name in unique_values["names"]|sort %}
         <div class="form-check">
           <input type="checkbox" id="nameFilterCheck{{name}}"
           class="form-check-input" name="name" value="{{name}}" {% if
