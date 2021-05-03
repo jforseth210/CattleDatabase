@@ -88,7 +88,7 @@
         <h5 class="pt-3">Date</h5>
           <select form="search-form" name="date" class="form-select" onchange="this.form.submit()">
             <option value="" disabled selected>Select Date</option>
-            {% for date in unique_values["dates"] %}
+            {% for date in unique_values["dates"]|sort %}
             <option>{{date}}</option>
             {% endfor %}
           </select>
