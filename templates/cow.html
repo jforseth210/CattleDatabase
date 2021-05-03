@@ -43,6 +43,14 @@ content %}
                         </svg>
                         Transfer Ownership
                     </button>
+                    <button class="m-2 btn btn-warning" data-toggle="modal" data-target="#tagNumberChangeModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5zm14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5z" />
+                        </svg>
+                        Change Tag Number
+                    </button>
                     {% if not cow.get_dam() or not cow.get_sire() %}
                     <button class="m-2 btn btn-success" data-toggle="modal" data-target="#addParentModal">
                         Add Parent
@@ -66,7 +74,7 @@ content %}
                 <div class="tab-pane fade show active" id="offspring" role="tabpanel" aria-labelledby="offspring-tab">
                     <button class="m-2 btn btn-success" data-toggle="modal" data-target="#customNewCowModal">Add
                         Calf</button>
-                        <table class=table>
+                    <table class=table>
                         </tr>
                         <th>Cow</th>
                         <th>Born</th>
@@ -173,6 +181,31 @@ content %}
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="tagNumberChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Change Tag Number</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Changing this <i>shouldn't</i> break anything, but it might. Be careful!</p>
+                    <form id="tagNumberChangeForm" method="POST" action="/cowChangeTagNumber">
+                        <input type="hidden" name="old_tag_number" value="{{cow.tag_number}}">
+                        <input name="new_tag_number" class="form-control" value="{{cow.tag_number}}"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="submit" form="tagNumberChangeForm" class="btn btn-primary" value="Update" />
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="addToExistingEventModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -191,7 +224,7 @@ content %}
                             <option value="{{event.event_id}}">{{event.name}} - {{event.date}}</option>
                             {% endfor %}
                         </select>
-                        <input name="new_cow" value={{cow.tag_number}} hidden/>
+                        <input name="new_cow" value={{cow.tag_number}} hidden />
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -227,27 +260,27 @@ content %}
                             <option>{{cow.tag_number}}</option>
                             {% endfor %}
                             <option value="">N/A</option>
-                          </select>
+                        </select>
                         {% elif not cow.get_dam() and cow.get_sire()%}
-                        <input name="parent_type" value="Dam" hidden/>
+                        <input name="parent_type" value="Dam" hidden />
                         <h5>Dam</h5>
                         <select name="parent_tag" class="form-control">
                             {% for cow in cows %} {% if cow.sex in ["Heifer", "Cow"] %}
                             <option>{{cow.tag_number}}</option>
                             {% endif %} {% endfor %}
                             <option value="">N/A</option>
-                          </select>
+                        </select>
                         {% else %}
                         <h5>Sire</h5>
-                        <input name="parent_type" value="Sire" hidden/>
+                        <input name="parent_type" value="Sire" hidden />
                         <select name="parent_tag" id="newCowSire" class="form-control">
-                          {% for cow in cows %} {% if cow.sex == "Bull" %}
-                          <option>{{cow.tag_number}}</option>
-                          {% endif %} {% endfor %}
-                          <option value="">N/A</option>
+                            {% for cow in cows %} {% if cow.sex == "Bull" %}
+                            <option>{{cow.tag_number}}</option>
+                            {% endif %} {% endfor %}
+                            <option value="">N/A</option>
                         </select>
                         {% endif %}
-                        
+
                     </form>
                 </div>
                 <div class="modal-footer">
