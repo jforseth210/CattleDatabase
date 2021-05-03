@@ -156,6 +156,7 @@ def event_add_remove_cows():
         event.cows.append(get_cow_from_tag(new_cow))
     db.session.commit()
     return redirect(request.referrer)
+
 @ app.route("/eventChangeDate", methods=["POST"])
 def event_change_date():
     event_id = request.form.get("event_id")
@@ -165,12 +166,21 @@ def event_change_date():
     event.date = date
     db.session.commit()
     return redirect(request.referrer)
+
 @ app.route("/cowexists/<tag_number>")
 def cow_exists(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     return "True" if cow else "False"
 
-
+@app.route("/dateexists/<date>")
+def check_if_date_exists(date):
+    events = Event.query.filter_by(date=date).all()
+    if events:
+        return f"Found {len(events)} events on {date}: " + ', '.join(
+            event.name for event in events
+        )
+    else:
+        return "No events on this date"
 @ app.route("/newCow", methods=["POST"])
 def new_cow():
     date = request.form.get('date')

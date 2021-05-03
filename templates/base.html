@@ -265,6 +265,26 @@
         .addEventListener("input", function () {
           validateTagNumber(this);
         });
+
+      function checkForEvents(date) {
+        console.log("Checking if event on " + date.value + "");
+        const Http = new XMLHttpRequest();
+        const url = "/dateexists/" + date.value;
+        Http.open("GET", url);
+        Http.send();
+        Http.onreadystatechange = (e) => {
+          message = document.getElementById("dateHelperText");
+          if (Http.status == 200){
+            message.innerHTML = Http.responseText;
+          }
+        };
+      }
+
+      document
+        .getElementById("cowNewEventDateField")
+        .addEventListener("input", function () {
+          checkForEvents(this);
+        });
     </script>
     {% block js %}{% endblock %}
   </body>

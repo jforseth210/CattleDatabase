@@ -345,7 +345,8 @@ content %}
                     <form id="newEventForm" method="post" action="/newEvent">
                         <input name="tag_number" value="{{cow.tag_number}}" hidden>
                         <h5>Date</h5>
-                        <input name="date" type="date" class="form-control" />
+                        <small id="dateHelperText" class="form-text text-success"></small>
+                        <input id="cowNewEventDateField" name="date" type="date" class="form-control" />
                         <h5>Name</h5>
                         <input name="name" type="text" class="form-control" />
                         <h5>Description</h5>
