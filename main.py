@@ -151,7 +151,7 @@ def event_add_remove_cows():
 
     event = Event.query.filter_by(event_id=event_id).first()
     if all_cows:
-        event.cows = [get_cow_from_tag(cow) for cow in cows]
+        event.cows = [get_cow_from_tag(cow) for cow in all_cows]
     elif new_cow:
         event.cows.append(get_cow_from_tag(new_cow))
     db.session.commit()
@@ -303,7 +303,7 @@ def new_event():
 
     db.session.add(new_event_object)
     db.session.commit()
-    return redirect(request.referrer)
+    return redirect(request.referrer+"#events")
 
 
 if __name__ == "__main__":
