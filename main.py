@@ -224,6 +224,21 @@ def transferOwnership():
     db.session.add(sale_event)
     db.session.commit()
     return redirect(request.referrer)
+
+@app.route("/cowAddParent",methods=["POST"])
+def cow_add_parent():
+    tag_number = request.form.get("tag_number")
+    parent_type = request.form.get("parent_type")
+    parent_tag = request.form.get("parent_tag")
+
+    cow = get_cow_from_tag(tag_number)
+
+    if parent_type == "Dam":
+        cow.dam_id = get_cow_from_tag(parent_tag).cow_id
+    else:
+        cow.sire_id = get_cow_from_tag(parent_tag).cow_id
+    db.session.commit()
+    return redirect(request.referrer)
 @ app.route("/newEvent", methods=["POST"])
 def new_event():
     tag = request.form.get('tag_number')

@@ -43,6 +43,11 @@ content %}
                         </svg>
                         Transfer Ownership
                     </button>
+                    {% if not cow.get_dam() or not cow.get_sire() %}
+                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#addParentModal">
+                        Add Parent
+                    </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -132,7 +137,8 @@ content %}
                     </table>
                     <button class="m-2 btn btn-success" data-toggle="modal" data-target="#customNewEventModal">New
                         Event</button>
-                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#addToExistingEventModal">Add to Existing Event</button>
+                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#addToExistingEventModal">Add
+                        to Existing Event</button>
                 </div>
             </div>
         </div>
@@ -182,8 +188,8 @@ content %}
                         <h5>Event</h5>
                         <select class="form-control" name="event">
                             {% for event in events %}
-                                <option value="{{event.id}}">{{event.name}} - {{event.date}}</option>
-                            {%  endfor %}
+                            <option value="{{event.id}}">{{event.name}} - {{event.date}}</option>
+                            {% endfor %}
                         </select>
                     </form>
                 </div>
@@ -192,6 +198,62 @@ content %}
                         Close
                     </button>
                     <input type="submit" form="transferForm" class="btn btn-primary" value="Transfer" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addParentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Parent</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addParentForm" method="POST" action="/cowAddParent">
+                        <input name="tag_number" value="{{cow.tag_number}}" hidden>
+                        {% if not cow.get_dam() and not cow.get_sire()%}
+                        <h5>Parent</h5>
+                        <select name="parent_type" class="form-control">
+                            <option>Dam</option>
+                            <option>Sire</option>
+                        </select>
+                        <select name="parent_tag" class="form-control">
+                            {% for cow in cows %}
+                            <option>{{cow.tag_number}}</option>
+                            {% endfor %}
+                            <option value="">N/A</option>
+                          </select>
+                        {% elif not cow.get_dam() and cow.get_sire()%}
+                        <input name="parent_type" value="Dam" hidden/>
+                        <h5>Dam</h5>
+                        <select name="parent_tag" class="form-control">
+                            {% for cow in cows %} {% if cow.sex in ["Heifer", "Cow"] %}
+                            <option>{{cow.tag_number}}</option>
+                            {% endif %} {% endfor %}
+                            <option value="">N/A</option>
+                          </select>
+                        {% else %}
+                        <h5>Sire</h5>
+                        <input name="parent_type" value="Sire" hidden/>
+                        <select name="parent_tag" id="newCowSire" class="form-control">
+                          {% for cow in cows %} {% if cow.sex == "Bull" %}
+                          <option>{{cow.tag_number}}</option>
+                          {% endif %} {% endfor %}
+                          <option value="">N/A</option>
+                        </select>
+                        {% endif %}
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Close
+                    </button>
+                    <input type="submit" form="addParentForm" class="btn btn-primary" value="Add Parent" />
                 </div>
             </div>
         </div>
@@ -210,14 +272,15 @@ content %}
                     <form id="newCowForm" method="post" action="/newCow"
                         onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))">
                         <h5>Date:</h5>
-                        <input name="date" type="date" class="form-control"/>
+                        <input name="date" type="date" class="form-control" />
                         <div class="form-check">
                             <input type="checkbox" name="born_event" id="born_event" class="form-check-input" checked>
                             <label for="born_event" class="form-check-label">Add "born" event for calf</label>
                         </div>
                         {% if cow.sex in ["Cow", "Heifer"] %}
                         <div class="form-check">
-                            <input type="checkbox" name="calved_event" id="calved_event" class="form-check-input" checked>
+                            <input type="checkbox" name="calved_event" id="calved_event" class="form-check-input"
+                                checked>
                             <label for="calved_event" class="form-check-label">Add "calved" event for cow</label>
                         </div>
                         {% endif%}
