@@ -144,14 +144,27 @@ def showEvent(event_id):
 
 @app.route("/eventAddRemoveCows", methods=["POST"])
 def event_add_remove_cows():
-    cows = request.form.getlist("cow")
+    all_cows = request.form.getlist("all_cows")
+    new_cow = request.form.get("new_cow")
+
     event_id = request.form.get("event")
 
     event = Event.query.filter_by(event_id=event_id).first()
-    event.cows = [get_cow_from_tag(cow) for cow in cows]
+    if all_cows:
+        event.cows = [get_cow_from_tag(cow) for cow in cows]
+    elif new_cow:
+        event.cows.append(get_cow_from_tag(new_cow))
     db.session.commit()
     return redirect(request.referrer)
+@ app.route("/eventChangeDate", methods=["POST"])
+def event_change_date():
+    event_id = request.form.get("event_id")
+    date = request.form.get("date")
 
+    event = Event.query.filter_by(event_id=event_id).first()
+    event.date = date
+    db.session.commit()
+    return redirect(request.referrer)
 @ app.route("/cowexists/<tag_number>")
 def cow_exists(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
@@ -217,7 +230,7 @@ def transferOwnership():
     
     cow = Cow.query.filter_by(tag_number=tag_number).first()
 
-    sale_event = Event(date=date, name="Transfer", description=f"Transfer {cow.tag_number} from {cow.owner} to {new_owner}:\n{description}")
+    sale_event = Event(date=date, name="Transfer", description=f"Transfer {cow.tag_number} from {cow.owner} to {new_owner}:\n{description}", cows=[cow])
     
     cow.owner = new_owner
     
@@ -239,6 +252,7 @@ def cow_add_parent():
         cow.sire_id = get_cow_from_tag(parent_tag).cow_id
     db.session.commit()
     return redirect(request.referrer)
+
 @ app.route("/newEvent", methods=["POST"])
 def new_event():
     tag = request.form.get('tag_number')
