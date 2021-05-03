@@ -64,7 +64,9 @@ content %}
             </ul>
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="offspring" role="tabpanel" aria-labelledby="offspring-tab">
-                    <table class=table>
+                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#customNewCowModal">Add
+                        Calf</button>
+                        <table class=table>
                         </tr>
                         <th>Cow</th>
                         <th>Born</th>
@@ -111,10 +113,12 @@ content %}
                         </tr>
                         {% endfor %}
                     </table>
-                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#customNewCowModal">Add
-                        Calf</button>
                 </div>
                 <div class="tab-pane fade show" id="events" role="tabpanel" aria-labelledby="events-tab">
+                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#customNewEventModal">New
+                        Event</button>
+                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#addToExistingEventModal">Add
+                        to Existing Event</button>
                     <table class=table>
                         </tr>
                         <th>Date</th>
@@ -135,10 +139,6 @@ content %}
                         </tr>
                         {% endfor %}
                     </table>
-                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#customNewEventModal">New
-                        Event</button>
-                    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#addToExistingEventModal">Add
-                        to Existing Event</button>
                 </div>
             </div>
         </div>
@@ -184,13 +184,14 @@ content %}
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="addToExistingEventForm" method="POST" action="/addCowToEvent">
+                    <form id="addToExistingEventForm" method="POST" action="/eventAddRemoveCows">
                         <h5>Event</h5>
                         <select class="form-control" name="event">
                             {% for event in events %}
-                            <option value="{{event.id}}">{{event.name}} - {{event.date}}</option>
+                            <option value="{{event.event_id}}">{{event.name}} - {{event.date}}</option>
                             {% endfor %}
                         </select>
+                        <input name="new_cow" value={{cow.tag_number}} hidden/>
                     </form>
                 </div>
                 <div class="modal-footer">
