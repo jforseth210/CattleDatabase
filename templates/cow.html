@@ -221,7 +221,7 @@ content %}
                         <h5>Event</h5>
                         <select class="form-control" name="event">
                             {% for event in events|sort(attribute="date")|reverse %}
-                            <option value="{{event.event_id}}">{{event.name}} - {{event.date}}</option>
+                            <option value="{{event.event_id}}">{{event.date}} - {{event.name}}</option>
                             {% endfor %}
                         </select>
                         <input name="new_cow" value={{cow.tag_number}} hidden />
