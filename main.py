@@ -167,6 +167,26 @@ def event_change_date():
     db.session.commit()
     return redirect(request.referrer)
 
+@ app.route("/eventChangeDescription", methods=["POST"])
+def event_change_description():
+    event_id = request.form.get("event_id")
+    description = request.form.get("description")
+
+    event = Event.query.filter_by(event_id=event_id).first()
+    event.description = description
+    db.session.commit()
+    return redirect(request.referrer)
+
+@ app.route("/eventChangeName", methods=["POST"])
+def event_change_name():
+    event_id = request.form.get("event_id")
+    name = request.form.get("name")
+
+    event = Event.query.filter_by(event_id=event_id).first()
+    event.name = name
+    db.session.commit()
+    return redirect(request.referrer)
+
 @ app.route("/cowexists/<tag_number>")
 def cow_exists(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
