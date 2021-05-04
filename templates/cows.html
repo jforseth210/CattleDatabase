@@ -14,7 +14,7 @@
         </tr>
         {% for cow in cows|sort(attribute='tag_number') %}
         <tr class="clickable-tr {% if cow.owner not in ["Justin", "Nolan", "Orville", "Clayt"]%}text-secondary{%endif%}" onclick="window.location.href = '/cow/{{cow.tag_number}}';">
-            <td class="w-25">
+            <td>
                 <h7>{{ cow.tag_number }}<h7>
             </td>
             <td>
