@@ -64,7 +64,7 @@ def events():
 @app.route("/transactions")
 def transactions():
     transactions = Transaction.query.all()
-    return render_template("transactions.html", transactions=transactions, total=total)
+    return render_template("transactions.html", transactions=transactions)
 @app.route("/search")
 def search():
     # Arguments
@@ -288,12 +288,13 @@ def transferOwnership():
     tag_number = request.form.get("tag_number")
     new_owner = request.form.get("newOwner")
     date = request.form.get("date")
+    price = request.form.get("price")
     description = request.form.get("description")
 
     cow = Cow.query.filter_by(tag_number=tag_number).first()
-
+    sale_transaction = Transaction(name="Sold", description=f"{cow.owner} sold {tag_number} to {new_owner}: {description}", price=price)
     sale_event = Event(date=date, name="Transfer",
-                       description=f"Transfer {cow.tag_number} from {cow.owner} to {new_owner}:\n{description}", cows=[cow])
+                       description=f"Transfer {cow.tag_number} from {cow.owner} to {new_owner}:\n{description}", cows=[cow], transactions=[sale_transaction])
 
     cow.owner = new_owner
 
