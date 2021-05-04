@@ -64,7 +64,7 @@ def events():
 @app.route("/transactions")
 def transactions():
     transactions = Transaction.query.all()
-    return render_template("transactions.html", transactions=transactions)
+    return render_template("transactions.html", transactions=transactions, total=total)
 @app.route("/search")
 def search():
     # Arguments
@@ -136,7 +136,14 @@ def showCow(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     if not cow:
         return redirect("/")
-    return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=Event.query.all())
+    events = Event.query.all()
+
+    transaction_total = 0
+    for event in events:
+        for transaction in event.transactions:
+            transaction_total += transaction.price
+
+    return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total = transaction_total)
 
 
 @app.route("/cowChangeTagNumber", methods=["POST"])

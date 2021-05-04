@@ -69,6 +69,10 @@ content %}
                     <a class="nav-link" id="events-tab" data-toggle="tab" href="#events" role="tab"
                         aria-controls="events" aria-selected="false">Events</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="events-tab" data-toggle="tab" href="#transactions" role="tab"
+                        aria-controls="transactions" aria-selected="false">Transactions</a>
+                </li>
             </ul>
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="offspring" role="tabpanel" aria-labelledby="offspring-tab">
@@ -146,6 +150,40 @@ content %}
                             </td>
                         </tr>
                         {% endfor %}
+                    </table>
+                </div>
+                <div class="tab-pane fade show" id="transactions" role="tabpanel" aria-labelledby="transactions">
+                    <table class="table">
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                        </tr>
+                        {% for event in cow.events %}
+                            {% for transaction in event.transactions %}
+                            <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
+                                <td>
+                                    <h7>{{transaction.event.date}}</h7>
+                                </td>
+                                <td>
+                                    <h7>{{transaction.name}}</h7>
+                                </td>
+                                <td>
+                                    <h7>{{ transaction.description }}<h7>
+                                </td>
+                                <td>
+                                    <h7>{{ transaction.price }}<h7>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {%endfor%}
+                        <tr>
+                            <th>Total</th>
+                            <th></th>
+                            <th></th>
+                            <th>{{transaction_total}}</th>
+                        </tr>
                     </table>
                 </div>
             </div>
