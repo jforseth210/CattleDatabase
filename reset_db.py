@@ -24,6 +24,6 @@ with app.app_context():
             dam_id=cow1.cow_id,
             sire_id=bull.cow_id
     )
-    calf.events.append(Event(name="Born", description="N/A", date="2021-04-18", transactions=[Transaction(name="Vet Bills", amount=102.29, description="Cesarean"), Transaction(name="Another Transaction", amount=10.24, description="IDK")]))
+    calf.events.append(Event(name="Born", description="N/A", date="2021-04-18", transactions=[Transaction(name="Vet Bills", price=102.29, description="Cesarean"), Transaction(name="Another Transaction", price=10.24, description="IDK")]))
     db.session.add(calf)
     db.session.commit()

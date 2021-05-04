@@ -29,7 +29,7 @@
         <h7>{% for transaction in event.transactions %} {{transaction.name}}{% if not loop.last %}, {% endif %}{% endfor %}<h7>
     </td>
     <td>
-        <h7>${{ event.transactions | sum(attribute="amount")}}<h7>
+        <h7>${{ event.transactions | sum(attribute="price")}}<h7>
     </td>
 </tr>
 {% endfor %}

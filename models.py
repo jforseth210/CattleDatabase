@@ -95,7 +95,7 @@ class Event(db.Model):
 class Transaction(db.Model):
     transaction_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
-    amount = db.Column(db.Float)
+    price = db.Column(db.Float)
     description = db.Column(db.Text)
 
     event_id = db.Column('event_id', db.Integer, db.ForeignKey(
@@ -105,7 +105,7 @@ class Transaction(db.Model):
         'Event', backref=db.backref('transactions', lazy=True))
 
     def __repr__(self):
-        return f"Transaction {self.transaction_id}: {self.amount} - {self.name} - {self.description}"
+        return f"Transaction {self.transaction_id}: {self.price} - {self.name} - {self.description}"
 
 
 class SearchResult():
