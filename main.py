@@ -2,7 +2,7 @@ import json
 from flask import Flask, render_template, request, redirect
 import re
 
-from models import db, Cow, Event, SearchResult
+from models import db, Cow, Event, Transaction, SearchResult
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -61,7 +61,10 @@ def events():
     cows = Cow.query.all()
     return render_template("events.html", events=events, cows=cows)
 
-
+@app.route("/transactions")
+def transactions():
+    transactions = Transaction.query.all()
+    return render_template("transactions.html", transactions=transactions)
 @app.route("/search")
 def search():
     # Arguments

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title%}Cattle Records{% endblock %}
+{% block content %}
+<div class="container-fluid">
+<table class=table>
+    <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+    </tr>
+    {% for transaction in transactions %}
+    <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
+        <td>
+            <h7>{{transaction.event.date}}</h7>
+        </td>
+        <td>
+            <h7>{{transaction.name}}</h7>
+        </td>
+        <td>
+            <h7>{{ transaction.description }}<h7>
+        </td>
+        <td>
+            <h7>{{ transaction.price }}<h7>
+        </td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <th>Total</th>
+        <th></th>
+        <th></th>
+        <th>{{transactions|sum(attribute="price")}}</th>
+    </tr>
+{% endblock %}
+    
