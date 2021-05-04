@@ -8,20 +8,28 @@
 <th>Description</th>
 <th>Cows</th>
 <th>Date</th>
+<th>Transactions</th>
+<th>Price</th>
 </tr>
 {% for event in events|sort(attribute='date') %}
         <tr class="clickable-tr" onclick="window.location.href = '/event/{{event.event_id}}';">
-    <td class="w-25">
+    <td>
         <h7>{{event.name}}<h7>
     </td>
-    <td class="w-25">
+    <td>
         <h7>{{event.description}}<h7>
     </td>
     <td>
         <h7>{% for cow in event.get_cows() %} {{cow.tag_number}}{% if not loop.last %}, {% endif %}{% endfor %}</h7>
-        <td class="w-25">
+        <td>
             <h7>{{event.date}}<h7>
         </td>
+    </td>
+    <td>
+        <h7>{% for transaction in event.transactions %} {{transaction.name}}{% if not loop.last %}, {% endif %}{% endfor %}<h7>
+    </td>
+    <td>
+        <h7>${{ event.transactions | sum(attribute="amount")}}<h7>
     </td>
 </tr>
 {% endfor %}
