@@ -40,6 +40,13 @@ class Cow(db.Model):
 
     def get_events(self):
         return self.events
+    
+    def get_transactions(self):
+        transactions = []
+        for event in self.events:
+            for transaction in event.transactions:
+                transactions.append(transaction)
+        return transactions
 
     def get_birthdate(self):
         events = self.get_events()
@@ -104,6 +111,8 @@ class Transaction(db.Model):
     event = db.relationship(
         'Event', backref=db.backref('transactions', lazy=True))
 
+    def get_cows(self):
+        return [transaction for transaction in self.event.cows]
     def __repr__(self):
         return f"Transaction {self.transaction_id}: {self.price} - {self.name} - {self.description}"
 
