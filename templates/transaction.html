@@ -36,7 +36,7 @@ content %}
                             <path
                                 d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V4zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2H3z" />
                         </svg>
-                        Change Price
+                        Change Amount
                     </button>
                     <button class="m-2 btn btn-secondary" data-toggle="modal" data-target="#descriptionChangeModal">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -201,26 +201,27 @@ content %}
         </div>
     </div>
 </div>
-<div class="modal fade" id="dateChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="priceChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Change Date</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Change Amount</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="transactionChangeDateForm" method="POST" action="/transactionChangeDate">
+                <form id="transactionChangePriceForm" method="POST" action="/transactionChangePrice">
                     <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
-                    <h5>Date</h5>
-                    <input type="date" name="date" class="form-control">
+                    <h5>New Amount</h5>
+                    <small><i>Enter a negative number for expenses, postive for income</i></small>
+                    <input name="price" type="number" class="form-control" placeholder="${{transaction.price}}">
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <input type="submit" form="transactionChangeDateForm" class="btn btn-primary" value="Change Date" />
+                <input type="submit" form="transactionChangePriceForm" class="btn btn-primary" value="Change Amount" />
             </div>
         </div>
     </div>
