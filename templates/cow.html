@@ -173,7 +173,7 @@ content %}
                                     <h7>{{ transaction.description }}<h7>
                                 </td>
                                 <td>
-                                    <h7>{{ transaction.price }}<h7>
+                                    <h7 class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">{{ transaction.price }}<h7>
                                 </td>
                             </tr>
                             {% endfor %}
