@@ -113,12 +113,24 @@ class Transaction(db.Model):
 
     def get_cows(self):
         return [transaction for transaction in self.event.cows]
+
+
+    def search(self, query, prices=[], names=[]):
+        query_match = query.lower() in repr(self).lower()
+        price_match = not prices or self.price in prices
+        name_match = not names or self.name in names
+        return query_match and price_match and name_match
+
+    def toSearchResult(self, query):
+        if query:
+            return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/transaction/{self.transaction_id}")
+        return SearchResult(self.name, repr(self), f"/transaction/{self.transaction_id}")
     def __repr__(self):
-        return f"Transaction {self.transaction_id}: {self.price} - {self.name} - {self.description}"
+        return f"Transaction {self.transaction_id}: ${self.price} - {self.name} - {self.description}"
 
 
 class SearchResult():
     def __init__(self, title, body, url):
         self.title = title
-        self.body = Markup(body)
+        self.body = body
         self.url = url

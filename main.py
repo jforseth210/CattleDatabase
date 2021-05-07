@@ -1,5 +1,5 @@
 import json
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, Markup
 import re
 
 from models import db, Cow, Event, Transaction, SearchResult
@@ -14,7 +14,18 @@ def get_cow_from_tag(tag):
     return Cow.query.filter_by(tag_number=tag).first()
 
 
-def get_unique_cow_values():
+def get_unique_values():
+    unique_values = {}
+
+    unique_values.update(cow_unique_values())
+    unique_values.update(event_unique_values())
+    unique_values.update(transaction_unique_values())
+
+    unique_values["types"] = ["Cow", "Event", "Transaction"]
+    return unique_values
+
+
+def cow_unique_values():
     cows = Cow.query.all()
     tags = set()
     sexes = set()
@@ -30,10 +41,12 @@ def get_unique_cow_values():
             dams.add(cow.get_dam().tag_number)
         if cow.get_sire():
             sires.add(cow.get_sire().tag_number)
-    return {"tags": tags, "sexes": sexes, "owners": owners, "sires": sires, "dams": dams}
+
+    return {"tags": tags, "sexes": sexes,
+            "owners": owners, "sires": sires, "dams": dams}
 
 
-def get_unique_event_values():
+def event_unique_values():
     events = Event.query.all()
 
     names = set()
@@ -41,7 +54,42 @@ def get_unique_event_values():
     for event in events:
         names.add(event.name)
         dates.add(event.date)
-    return {"names": names, "dates": dates}
+    return {"event_names": names, "dates": dates}
+
+
+def transaction_unique_values():
+    transactions = Transaction.query.all()
+
+    names = set()
+    prices = set()
+    for transaction in transactions:
+        names.add(transaction.name)
+        prices.add(transaction.price)
+    return {"transaction_names": names, "prices":prices}
+
+
+def get_results(types, argument_dict, query):
+    results = []
+    if "Cow" in types:
+        cows = Cow.query.all()
+        for cow in cows:
+            if cow.search(query, tags=argument_dict["tags"], sexes=argument_dict["sexes"], owners=argument_dict["owners"],
+                          sires=argument_dict["sires"], dams=argument_dict["dams"]):
+                results.append(cow.toSearchResult(query))
+    if "Event" in types:
+        events = Event.query.all()
+        for event in events:
+            if event.search(
+                query, names=argument_dict["event_names"], dates=argument_dict["dates"]):
+                results.append(event.toSearchResult(query))
+
+    if "Transaction" in types:
+        transactions = Transaction.query.all()
+        for transaction in transactions:
+            if transaction.search(
+                query, names=argument_dict["transaction_names"]):
+                results.append(transaction.toSearchResult(query))
+    return results
 
 
 @app.route("/")
@@ -61,63 +109,53 @@ def events():
     cows = Cow.query.all()
     return render_template("events.html", events=events, cows=cows)
 
+
 @app.route("/transactions")
 def transactions():
     transactions = Transaction.query.all()
     return render_template("transactions.html", transactions=transactions)
+
+
 @app.route("/search")
 def search():
     # Arguments
     query = request.args.get("q")
-    types = request.args.getlist("type")
-    # Cow arguments
-    tags = request.args.getlist("tag")
-    sexes = request.args.getlist("sex")
-    owners = request.args.getlist("owner")
-    sires = request.args.getlist("sire")
-    dams = request.args.getlist("dam")
-    # Event arguments
-    dates = request.args.getlist("date")
-    names = request.args.getlist("name")
+    # What kind of things are we searching for?
+    types = determine_types(request)
 
-    # Package for jinja
-    checked_values = {
-        "types": types,
-        "tags": tags,
-        "sexes": sexes,
-        "owners": owners,
-        "sires": sires,
-        "dams": dams,
+    argument_dict = {"types": request.args.getlist("type")}
+    if "Cow" in types:
+        argument_dict.update({
+            "tags": request.args.getlist("tag"),
+            "sexes": request.args.getlist("sex"),
+            "owners": request.args.getlist("owner"),
+            "sires": request.args.getlist("sire"),
+            "dams": request.args.getlist("dam")
+        })
 
-        "names": names,
-        "dates": dates
-    }
+    if "Event" in types:
+        argument_dict.update({
+            "dates": request.args.getlist("date"),
+            "event_names": request.args.getlist("event_name")
+        })
 
-    # Get unique values from each column
-    unique_values = get_unique_cow_values()
-    unique_values.update(get_unique_event_values())
-    # Add the two types of object
-    unique_values["types"] = ["Cow", "Event"]
+    if "Transaction" in types:
+        argument_dict.update({
+            "transaction_names": request.args.getlist("transaction_name"),
+            "prices": request.args.getlist("price")
+        })
 
-    events = []
-    cows = []
-    # If no cow specific parameters are checked, and events haven't been filtered out
-    if not (tags or sexes or owners or dams or sires or (types and "Event" not in types)):
-        events = Event.query.all()
+    unique_values = get_unique_values()
 
-    # If no event specific parameters are checked, and cows haven't been filtered out
-    if not (dates or names or (types and "Cow" not in types)):
-        cows = Cow.query.all()
+    results = get_results(types, argument_dict, query)
 
-    # Run object.search() for each object, and if it returns true, convert it to a SearchResult and add it to a list
-    cow_results = [cow.toSearchResult(query) for cow in cows if cow.search(query, tags=tags, sexes=sexes, owners=owners,
-                                                                           sires=sires, dams=dams)]
-    event_results = [event.toSearchResult(query)
-                     for event in events if event.search(query, dates=dates, names=names)]
-
-    # Put the results together
-    results = cow_results+event_results
-
+    #TODO: Fix this mess
+    if types == ["Transaction"]:
+        if argument_dict["prices"] == ["Low to High"]:
+            for i in results:
+            results.sort(key=lambda x: float(re.search("\$\d+.\d+", x.body).group().strip("$")))
+        else:
+            results.sort(key=lambda x: float(re.search("\$\d+.\d+", x.body).group().strip("$")), reverse=True)
     # Send it
     return render_template("search.html",
                            # What the user searched for
@@ -127,11 +165,38 @@ def search():
                            # The possible filter options
                            unique_values=unique_values,
                            # The selected filter options
-                           checked_values=checked_values
+                           checked_values=argument_dict
                            )
 
 
-@ app.route("/cow/<tag_number>")
+def determine_types(request):
+    COW_ARGS = ["tag","sex","owner","sire","dam"]
+    EVENT_ARGS = ["event_name","date"]
+    TRANSACTION_ARGS = ["transaction_name","price"]
+    chosen_types = ["Cow", "Event", "Transaction"]
+
+    # Explicitly filtering by type
+    if "type" in request.args:
+        chosen_types = request.args.getlist("type")
+
+    # Implicitly filtering by type using filters
+    # exclusive to cows, events, or transactions
+    for arg in COW_ARGS:
+        if arg in request.args:
+            # If a not-cow is filtered by a cow attribute, no results
+            chosen_types = ["Cow"] if "Cow" in chosen_types else []
+    for arg in EVENT_ARGS:
+        if arg in request.args:
+            chosen_types = ["Event"] if "Event" in chosen_types else []
+
+    for arg in TRANSACTION_ARGS:
+        if arg in request.args:
+            chosen_types = ["Transaction"] if "Transaction" in chosen_types else []
+
+    return chosen_types
+
+
+@app.route("/cow/<tag_number>")
 def showCow(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     if not cow:
@@ -143,7 +208,7 @@ def showCow(tag_number):
         for transaction in event.transactions:
             transaction_total += transaction.price
 
-    return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total = transaction_total)
+    return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total=transaction_total)
 
 
 @app.route("/cowChangeTagNumber", methods=["POST"])
@@ -292,7 +357,8 @@ def transferOwnership():
     description = request.form.get("description")
 
     cow = Cow.query.filter_by(tag_number=tag_number).first()
-    sale_transaction = Transaction(name="Sold", description=f"{cow.owner} sold {tag_number} to {new_owner}: {description}", price=price)
+    sale_transaction = Transaction(
+        name="Sold", description=f"{cow.owner} sold {tag_number} to {new_owner}: {description}", price=price)
     sale_event = Event(date=date, name="Transfer",
                        description=f"Transfer {cow.tag_number} from {cow.owner} to {new_owner}:\n{description}", cows=[cow], transactions=[sale_transaction])
 
