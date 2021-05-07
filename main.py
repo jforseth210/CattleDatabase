@@ -197,7 +197,7 @@ def delete_cow():
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     db.session.delete(cow)
     db.session.commit()
-    return redirect(request.referrer)
+    return redirect('/cows')
 
 
 @app.route("/transferOwnership", methods=["POST"])
@@ -326,8 +326,14 @@ def delete_event():
     event = Event.query.filter_by(event_id=event_id).first()
     db.session.delete(event)
     db.session.commit()
-    return redirect(request.referrer)
+    return redirect('/events')
 
-
+@app.route("/deletetransaction", methods=["POST"])
+def delete_transaction():
+    transaction_id = request.form.get("transaction_id")
+    transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
+    db.session.delete(transaction)
+    db.session.commit()
+    return redirect('/transactions')
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
