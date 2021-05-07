@@ -27,10 +27,10 @@ def cows():
 
 
 @app.route("/cow/<tag_number>")
-def showCow(tag_number):
+def show_cow(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     if not cow:
-        return redirect("/")
+        return redirect(request.referrer)
     events = Event.query.all()
 
     transaction_total = 0
@@ -49,13 +49,26 @@ def events():
 
 
 @app.route("/event/<event_id>")
-def showEvent(event_id):
+def show_event(event_id):
+    event = Event.query.filter_by(event_id=event_id).first()
+    if not event:
+        return redirect(request.referrer)
+    return render_template("event.html", event=event, cows=Cow.query.all())
 
 
 @app.route("/transactions")
 def transactions():
     transactions = Transaction.query.all()
     return render_template("transactions.html", transactions=transactions)
+
+
+@app.route("/transaction/<transaction_id>")
+def show_transaction(transaction_id):
+    transaction = Transaction.query.filter_by(
+        transaction_id=transaction_id).first()
+    if not transaction:
+        return redirect(request.referrer)
+    return render_template("transaction.html", transaction=transaction, cows=Cow.query.all())
 
 
 @app.route('/calendar')
@@ -69,7 +82,7 @@ def event_api():
     events = Event.query.all()
     formatted_events = []
     for event in events:
-        cow_string = ", ".join([cow.tag_number for cow in event.cows])
+        cow_string = ", ".join(cow.tag_number for cow in event.cows)
         formatted_event = {
             'title': event.name + ": " + cow_string,
             'start': event.date,
@@ -115,22 +128,15 @@ def search():
     # TODO: Fix this mess
     if types == ["Transaction"]:
         if argument_dict["prices"] == ["Low to High"]:
+            for i in results:
+                print(i.body)
             results.sort(key=lambda x: float(
-                re.search("\$\d+.\d+", x.body).group().strip("$")))
+                re.search("\$.\d+.\d+", x.body).group().strip("$")))
         else:
             results.sort(key=lambda x: float(
-                re.search("\$\d+.\d+", x.body).group().strip("$")), reverse=True)
+                re.search("\$.\d+.\d+", x.body).group().strip("$")), reverse=True)
     # Send it
-    return render_template("search.html",
-                           # What the user searched for
-                           query=query,
-                           # The matching results
-                           results=results,
-                           # The possible filter options
-                           unique_values=unique_values,
-                           # The selected filter options
-                           checked_values=argument_dict
-                           )
+    return render_template("search.html", query=query, results=results, unique_values=unique_values, checked_values=argument_dict)
 
 
 @ app.route("/newCow", methods=["POST"])
@@ -169,6 +175,9 @@ def new_cow():
 
 @ app.route("/cowexists/<tag_number>")
 def cow_exists(tag_number):
+    cow = Cow.query.filter_by(tag_number=tag_number).first()
+
+    return "True" if cow else "False"
 
 
 @app.route("/cowChangeTagNumber", methods=["POST"])
@@ -180,15 +189,6 @@ def change_tag_number():
     cow.tag_number = new_tag_number
     db.session.commit()
     return redirect("/cow/"+new_tag_number)
-
-    event = Event.query.filter_by(event_id=event_id).first()
-    if not event:
-        return redirect("/events")
-    return render_template("event.html", event=event, cows=Cow.query.all())
-
-    cow = Cow.query.filter_by(tag_number=tag_number).first()
-
-    return "True" if cow else "False"
 
 
 @app.route("/deletecow", methods=["POST"])
@@ -223,6 +223,18 @@ def transferOwnership():
 
 @app.route("/cowAddParent", methods=["POST"])
 def cow_add_parent():
+    tag_number = request.form.get("tag_number")
+    parent_type = request.form.get("parent_type")
+    parent_tag = request.form.get("parent_tag")
+
+    cow = get_cow_from_tag(tag_number)
+
+    if parent_type == "Dam":
+        cow.dam_id = get_cow_from_tag(parent_tag).cow_id
+    else:
+        cow.sire_id = get_cow_from_tag(parent_tag).cow_id
+    db.session.commit()
+    return redirect(request.referrer)
 
 
 @ app.route("/newEvent", methods=["POST"])
@@ -313,19 +325,6 @@ def delete_event():
     event_id = request.form.get("event_id")
     event = Event.query.filter_by(event_id=event_id).first()
     db.session.delete(event)
-    db.session.commit()
-    return redirect(request.referrer)
-
-    tag_number = request.form.get("tag_number")
-    parent_type = request.form.get("parent_type")
-    parent_tag = request.form.get("parent_tag")
-
-    cow = get_cow_from_tag(tag_number)
-
-    if parent_type == "Dam":
-        cow.dam_id = get_cow_from_tag(parent_tag).cow_id
-    else:
-        cow.sire_id = get_cow_from_tag(parent_tag).cow_id
     db.session.commit()
     return redirect(request.referrer)
 
