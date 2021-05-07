@@ -169,7 +169,6 @@ def search():
     #TODO: Fix this mess
     if types == ["Transaction"]:
         if argument_dict["prices"] == ["Low to High"]:
-            for i in results:
             results.sort(key=lambda x: float(re.search("\$\d+.\d+", x.body).group().strip("$")))
         else:
             results.sort(key=lambda x: float(re.search("\$\d+.\d+", x.body).group().strip("$")), reverse=True)

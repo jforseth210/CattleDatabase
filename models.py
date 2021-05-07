@@ -132,5 +132,5 @@ class Transaction(db.Model):
 class SearchResult():
     def __init__(self, title, body, url):
         self.title = title
-        self.body = body
+        self.body = Markup(body)
         self.url = url
