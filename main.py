@@ -96,7 +96,24 @@ def get_results(types, argument_dict, query):
 def home():
     return redirect("/cows")
 
+@app.route('/calendar')
+def calendar():
+    cows = Cow.query.all()
+    return render_template('calendar.html', cows=cows)
 
+@app.route('/calendar/events/api')
+def event_api():
+    events = Event.query.all()
+    formatted_events = []
+    for event in events:
+        cow_string = ", ".join([cow.tag_number for cow in event.cows])
+        formatted_event = {
+            'title': event.name + ": " + cow_string,
+            'start': event.date,
+            'id':event.event_id
+        }
+        formatted_events.append(formatted_event)
+    return json.dumps(formatted_events)
 @app.route("/cows")
 def cows():
     cows = Cow.query.all()
