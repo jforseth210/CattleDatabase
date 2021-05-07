@@ -1,0 +1,228 @@
+{% extends 'base.html' %} {% block title%}Cattle Records{% endblock %} {% block
+content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{transaction.name}}</h2>
+                    <small><i>System Id: #000{{transaction.transaction_id}}</i></small><br />
+                    <ul>
+                        <li>Date: {{transaction.get_date()}}</li>
+                        <li>Amount: $
+                            <span class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">
+                                {{transaction.price}}</span>
+                        </li>
+                        <li>Description: {{transaction.description}}</li>
+                    </ul>
+                    <form method="post" action="/deletetransaction" class="p-0 m-2">
+                        <input name="transaction_id" value="{{transaction.transaction_id}}" hidden />
+                        <button type="submit" class="btn btn-danger">
+                            <!-- Trash icon-->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-trash" viewBox="0 0 16 16">
+                                <path
+                                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                <path fill-rule="evenodd"
+                                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                            </svg>
+                            Delete Transaction
+                        </button>
+                    </form>
+                    <button class="m-2 btn btn-primary" data-toggle="modal" data-target="#priceChangeModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-cash" viewBox="0 0 16 16">
+                            <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+                            <path
+                                d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V4zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2H3z" />
+                        </svg>
+                        Change Price
+                    </button>
+                    <button class="m-2 btn btn-secondary" data-toggle="modal" data-target="#descriptionChangeModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path
+                                d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                            <path fill-rule="evenodd"
+                                d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                        </svg>
+                        Change Description
+                    </button>
+                    <button class="m-2 btn btn-secondary" data-toggle="modal" data-target="#nameChangeModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path
+                                d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                            <path fill-rule="evenodd"
+                                d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                        </svg>
+                        Change Name
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" id="cows-tab" data-toggle="tab" href="#cows" role="tab" aria-controls="cows"
+                        aria-selected="true">Cows</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" id="events-tab" data-toggle="tab" href="#event" role="tab"
+                        aria-controls="event" aria-selected="true">Event</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="cows" role="tabpanel" aria-labelledby="cows-tab">
+                    <table class="table">
+                        <tr>
+                            <th>Tag Number</th>
+                            <th>Owner</th>
+                            <th>Sex</th>
+                        </tr>
+                        {% for cow in transaction.get_cows() %}
+                        <tr class="clickable-tr" onclick="window.location.href = '/cow/{{cow.tag_number}}';">
+                            <td>
+                                <h7>{{cow.tag_number}}</h7>
+                            </td>
+                            <td>
+                                <h7>{{ cow.owner }}<h7>
+                            </td>
+                            <td>
+                                <h7>{{ cow.sex }}<h7>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <small><i>Add or remove cows in the <a href="/event/{{transaction.event.event_id}}">event</a></i></small>
+                    <!--<button class="m-2 btn btn-success" data-toggle="modal"
+                        data-target="#transactionAddRemoveCowsModal">Add/Remove Cows</button>-->
+                </div>
+
+                <div class="tab-pane fade show" id="event" role="tabpanel" aria-labelledby="cows-tab">
+                    <table class=table>
+                        </tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        </tr>
+                        <tr class="clickable-tr" onclick="window.location.href = '/event/{{transaction.event.event_id}}';">
+                            <td>
+                                <h7>{{transaction.event.date}}<h7>
+                            </td>
+                            <td>
+                                <h7>{{transaction.event.name}}<h7>
+                            </td>
+                            <td>
+                                <h7>{{transaction.event.description}}<h7>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="transactionAddRemoveCowsModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add or Remove Cows from Transaction</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="transactionAddRemoveCowsForm" method="POST" action="/transactionAddRemoveCows">
+                    <input type="hidden" name="transaction" value="{{transaction.transaction_id}}">
+                    {% for cow in cows %}
+                    <div class="form-check">
+                        <input type="checkbox" name="all_cows" value="{{cow.tag_number}}"
+                            id="transactionAddRemoveCows{{cow.tag_number}}" class="form-check-input" {% if cow in
+                            transaction.cows %}checked{%endif%}>
+                        <label for="transactionAddRemoveCows{{cow.tag_number}}"
+                            class="form-check-label">{{cow.tag_number}}</label>
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" form="transactionAddRemoveCowsForm" class="btn btn-primary" value="Update" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="descriptionChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Description</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="descriptionChangeForm" method="POST" action="/transactionChangeDescription">
+                    <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
+                    <textarea name="description" class="form-control">{{transaction.description}}</textarea>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" form="descriptionChangeForm" class="btn btn-primary" value="Update" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="nameChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update name</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="nameChangeForm" method="POST" action="/transactionChangeName">
+                    <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
+                    <input name="name" class="form-control" value="{{transaction.name}}" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" form="nameChangeForm" class="btn btn-primary" value="Update" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="dateChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Change Date</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="transactionChangeDateForm" method="POST" action="/transactionChangeDate">
+                    <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
+                    <h5>Date</h5>
+                    <input type="date" name="date" class="form-control">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" form="transactionChangeDateForm" class="btn btn-primary" value="Change Date" />
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
