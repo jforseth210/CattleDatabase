@@ -336,12 +336,14 @@ def new_transaction():
 
     price = request.form.get('price')
     name = request.form.get('name')
+    tofrom = request.form.get('tofrom')
     description = request.form.get('description')
     new_transaction_object = Transaction(
         price=price,
         name=name,
         description=description,
-        event=event
+        event_id = event_id,
+        tofrom = tofrom
     )
 
     db.session.add(new_transaction_object)

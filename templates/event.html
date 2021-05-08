@@ -95,9 +95,10 @@ content %}
                         data-target="#eventAddRemoveCowsModal">Add/Remove Cows</button>
                 </div>
                 <div class="tab-pane fade show" id="transactions" role="tabpanel" aria-labelledby="transactions">
+                    <button class="m-2 btn btn-success" data-toggle="modal"
+                        data-target="#addTransactionModal">Add Transaction</button>
                     <table class="table">
                         <tr>
-                            <th>Date</th>
                             <th>To/From</th>
                             <th>Name</th>
                             <th>Description</th>
@@ -105,9 +106,6 @@ content %}
                         </tr>
                         {% for transaction in event.transactions %}
                         <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
-                            <td>
-                                <h7>{{transaction.event.date}}</h7>
-                            </td>
                             <td>
                                 <h7>{{transaction.tofrom}}</h7>
                             </td>
@@ -118,7 +116,7 @@ content %}
                                 <h7>{{ transaction.description }}<h7>
                             </td>
                             <td>
-                                <h7>{{ transaction.price }}<h7>
+                                <h7 class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">{{ transaction.price }}<h7>
                             </td>
                         </tr>
                         {% endfor %}
@@ -235,5 +233,35 @@ content %}
             </div>
         </div>
     </div>
+</div>
+<div class="modal fade" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Transaction</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="newTransactionForm" method="post" action="/newTransaction">
+          <input type="text" name="event_id" hidden value="{{event.event_id}}"/>
+          <h5>Transaction Name</h5>
+          <input type="text" name="name" class="form-control" />
+          <h5>Amount</h5>
+          <small><i>Negative for expenses/Positive for income</i></small><br/>
+          <input type="number" name="price" cless="form-control" />
+          <h5>To/From</h5>
+          <input type="text" name="tofrom" class="form-control" />
+          <h5>Additional Information</h5>
+          <textarea name="description" class="form-control"></textarea>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" form="newTransactionForm" class="btn btn-primary">Add Transaction</button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
