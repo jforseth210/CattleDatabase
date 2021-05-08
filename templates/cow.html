@@ -156,6 +156,7 @@ content %}
                     <table class="table">
                         <tr>
                             <th>Date</th>
+                            <th>To/From</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th>Price</th>
@@ -165,6 +166,9 @@ content %}
                             <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
                                 <td>
                                     <h7>{{transaction.event.date}}</h7>
+                                </td>
+                                <td>
+                                    <h7>{{transaction.tofrom}}</h7>
                                 </td>
                                 <td>
                                     <h7>{{transaction.name}}</h7>

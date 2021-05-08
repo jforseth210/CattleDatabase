@@ -103,6 +103,7 @@ class Transaction(db.Model):
     transaction_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
     price = db.Column(db.Float)
+    tofrom = db.Column(db.String(255))
     description = db.Column(db.Text)
 
     event_id = db.Column('event_id', db.Integer, db.ForeignKey(
@@ -128,7 +129,9 @@ class Transaction(db.Model):
             return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/transaction/{self.transaction_id}")
         return SearchResult(self.name, repr(self), f"/transaction/{self.transaction_id}")
     def __repr__(self):
-        return f"Transaction: {self.name} - ${self.price} - {self.description}"
+        if self.price > 0:
+            return f"Transaction: ${self.price} from {self.tofrom} for {self.name} -{self.description}"
+        return f"Transaction: ${self.price} to {self.tofrom} for {self.name} -{self.description}"
 
 
 class SearchResult():
