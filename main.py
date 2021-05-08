@@ -210,7 +210,7 @@ def transferOwnership():
 
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     sale_transaction = Transaction(
-        name="Sold", description=f"{cow.owner} sold {tag_number} to {new_owner}: {description}", price=price)
+        name="Sold", description=f"{cow.owner} sold {tag_number}: {description}", price=price, tofrom=new_owner)
     sale_event = Event(date=date, name="Transfer",
                        description=f"Transfer {cow.tag_number} from {cow.owner} to {new_owner}:\n{description}", cows=[cow], transactions=[sale_transaction])
 
@@ -328,12 +328,82 @@ def delete_event():
     db.session.commit()
     return redirect('/events')
 
+
+@ app.route("/newTransaction", methods=["POST"])
+def new_transaction():
+    event_id = request.form.get('event_id')
+    event = Event.query.filter_by(event_id=event_id).first()
+
+    price = request.form.get('price')
+    name = request.form.get('name')
+    description = request.form.get('description')
+    new_transaction_object = Transaction(
+        price=price,
+        name=name,
+        description=description,
+        event=event
+    )
+
+    db.session.add(new_transaction_object)
+    db.session.commit()
+    return redirect(request.referrer+"#transactions")
+
+
+@ app.route("/transactionChangePrice", methods=["POST"])
+def transaction_change_price():
+    transaction_id = request.form.get("transaction_id")
+    price = request.form.get("price")
+
+    transaction = Transaction.query.filter_by(
+        transaction_id=transaction_id).first()
+    transaction.price = price
+    db.session.commit()
+    return redirect(request.referrer)
+
+
+@ app.route("/transactionChangeDescription", methods=["POST"])
+def transaction_change_description():
+    transaction_id = request.form.get("transaction_id")
+    description = request.form.get("description")
+
+    transaction = Transaction.query.filter_by(
+        transaction_id=transaction_id).first()
+    transaction.description = description
+    db.session.commit()
+    return redirect(request.referrer)
+
+
+@ app.route("/transactionChangeName", methods=["POST"])
+def transaction_change_name():
+    transaction_id = request.form.get("transaction_id")
+    name = request.form.get("name")
+
+    transaction = Transaction.query.filter_by(
+        transaction_id=transaction_id).first()
+    transaction.name = name
+    db.session.commit()
+    return redirect(request.referrer)
+
+@ app.route("/transactionChangeToFrom", methods=["POST"])
+def transaction_change_to_from():
+    transaction_id = request.form.get("transaction_id")
+    tofrom = request.form.get("tofrom")
+
+    transaction = Transaction.query.filter_by(
+        transaction_id=transaction_id).first()
+    transaction.tofrom = tofrom
+    db.session.commit()
+    return redirect(request.referrer)
+
 @app.route("/deletetransaction", methods=["POST"])
 def delete_transaction():
     transaction_id = request.form.get("transaction_id")
-    transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
+    transaction = Transaction.query.filter_by(
+        transaction_id=transaction_id).first()
     db.session.delete(transaction)
     db.session.commit()
     return redirect('/transactions')
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

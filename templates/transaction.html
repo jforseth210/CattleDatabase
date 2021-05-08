@@ -14,6 +14,11 @@ content %}
                                 {{transaction.price}}</span>
                         </li>
                         <li>Description: {{transaction.description}}</li>
+                        {% if transaction.price > 0 %}
+                        <li>From: {{transaction.tofrom}}</li>
+                        {% else %}
+                        <li>To: {{transaction.tofrom}}</li>
+                        {% endif %}
                     </ul>
                     <form method="post" action="/deletetransaction" class="p-0 m-2">
                         <input name="transaction_id" value="{{transaction.transaction_id}}" hidden />
@@ -57,6 +62,14 @@ content %}
                                 d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                         </svg>
                         Change Name
+                    </button>
+                    <button class="m-2 btn btn-primary" data-toggle="modal" data-target="#tofromChangeModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5zm14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5z" />
+                        </svg>
+                        Change To/From
                     </button>
                 </div>
             </div>
@@ -123,38 +136,6 @@ content %}
         </div>
     </div>
 </div>
-
-<div class="modal fade" id="transactionAddRemoveCowsModal" tabindex="-1" role="dialog"
-    aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add or Remove Cows from Transaction</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="transactionAddRemoveCowsForm" method="POST" action="/transactionAddRemoveCows">
-                    <input type="hidden" name="transaction" value="{{transaction.transaction_id}}">
-                    {% for cow in cows %}
-                    <div class="form-check">
-                        <input type="checkbox" name="all_cows" value="{{cow.tag_number}}"
-                            id="transactionAddRemoveCows{{cow.tag_number}}" class="form-check-input" {% if cow in
-                            transaction.cows %}checked{%endif%}>
-                        <label for="transactionAddRemoveCows{{cow.tag_number}}"
-                            class="form-check-label">{{cow.tag_number}}</label>
-                    </div>
-                    {% endfor %}
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <input type="submit" form="transactionAddRemoveCowsForm" class="btn btn-primary" value="Update" />
-            </div>
-        </div>
-    </div>
-</div>
 <div class="modal fade" id="descriptionChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -197,6 +178,29 @@ content %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <input type="submit" form="nameChangeForm" class="btn btn-primary" value="Update" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="tofromChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Change to/from</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="tofromChangeForm" method="POST" action="/transactionChangeToFrom">
+                    <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
+                    <input name="tofrom" class="form-control" value="{{transaction.tofrom}}" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" form="tofromChangeForm" class="btn btn-primary" value="Update" />
             </div>
         </div>
     </div>
