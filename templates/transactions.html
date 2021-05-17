@@ -3,16 +3,18 @@
 {% block content %}
 <div class="container-fluid">
     <table class=table>
-        <tr>
-            <th>Date</th>
-            <th>To/From</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Cows</th>
-            <th>Price (single)</th>
-            <th>Price (total)</th>
-        </tr>
-        {% for transaction in transactions|sort(attribute='event.date') %}
+        <thead style="position: sticky;top: 0" class="text-dark bg-light">
+            <tr>
+                <th>Date</th>
+                <th>To/From</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Cows</th>
+                <th>Price (single)</th>
+                <th>Price (total)</th>
+            </tr>
+        </thead>
+        {% for transaction in transactions|sort(attribute='event.date')|reverse %}
         <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
             <td>
                 <h7>{{transaction.event.date}}</h7>

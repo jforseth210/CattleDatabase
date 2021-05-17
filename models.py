@@ -55,6 +55,9 @@ class Cow(db.Model):
                 transactions.append(transaction)
         return transactions
 
+    def get_transaction_total(self):
+        return sum(transaction.price for transaction in self.get_transactions())
+
     def get_birthdate(self):
         events = self.get_events()
         for event in events:

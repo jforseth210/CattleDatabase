@@ -2,40 +2,43 @@
 {% block title%}Cattle Records{% endblock %}
 {% block content %}
 <div class="container-fluid">
-<table class=table>
-</tr>
-<th>Name</th>
-<th>Description</th>
-<th>Cows</th>
-<th>Date</th>
-<th>Transactions</th>
-<th>Price</th>
-</tr>
-{% for event in events|sort(attribute='date') %}
+    <table class=table>
+        <thead style="position: sticky;top: 0" class="text-dark bg-light">
+            <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Cows</th>
+            <th>Transactions</th>
+            <th>Price</th>
+            </tr>
+        </thead>
+        {% for event in events|sort(attribute='date')|reverse %}
         <tr class="clickable-tr" onclick="window.location.href = '/event/{{event.event_id}}';">
-    <td>
-        <h7>{{event.name}}<h7>
-    </td>
-    <td>
-        <h7>{{event.description}}<h7>
-    </td>
-    <td>
-        <h7>{% for cow in event.get_cows() %} {{cow.tag_number}}{% if not loop.last %}, {% endif %}{% endfor %}</h7>
-        <td>
-            <h7>{{event.date}}<h7>
-        </td>
-    </td>
-    <td>
-        <h7>{% for transaction in event.transactions %} {{transaction.name}}{% if not loop.last %}, {% endif %}{% endfor %}<h7>
-    </td>
-    <td>
-        <h7>${{ event.transactions | sum(attribute="price")}}<h7>
-    </td>
-</tr>
-{% endfor %}
-</table>
-<button class="m-2 btn btn-success" data-toggle="modal" data-target="#newEventModal">Add Event</button>
+            <td>
+                <h7>{{event.date}}<h7>
+            </td>
+            <td>
+                <h7>{{event.name}}<h7>
+            </td>
+            <td>
+                <h7>{{event.description}}<h7>
+            </td>
+            <td>
+                <h7>{% for cow in event.get_cows() %} {{cow.tag_number}}{% if not loop.last %}, {% endif %}{% endfor %}
+                </h7>
+            </td>
+            <td>
+                <h7>{% for transaction in event.transactions %} {{transaction.name}}{% if not loop.last %}, {% endif
+                    %}{% endfor %}<h7>
+            </td>
+            <td>
+                <h7>${{ event.transactions | sum(attribute="price")}}<h7>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <button class="m-2 btn btn-success" data-toggle="modal" data-target="#newEventModal">Add Event</button>
 
 </div>
 {% endblock %}
-    
