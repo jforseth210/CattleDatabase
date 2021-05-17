@@ -8,10 +8,11 @@
             <th>To/From</th>
             <th>Name</th>
             <th>Description</th>
+            <th>Cows</th>
             <th>Price (single)</th>
             <th>Price (total)</th>
         </tr>
-        {% for transaction in transactions %}
+        {% for transaction in transactions|sort(attribute='event.date') %}
         <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
             <td>
                 <h7>{{transaction.event.date}}</h7>
@@ -26,6 +27,9 @@
                 <h7>{{ transaction.description }}<h7>
             </td>
             <td>
+                <h7>{% for cow in transaction.get_cows() %} {{cow.tag_number}}{% if not loop.last %}, {% endif %}{% endfor %}</h7>
+            </td>
+            <td>
                 <h7 class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">{{
                     transaction.get_formatted_price() }}<h7>
             </td>
@@ -37,6 +41,7 @@
         {% endfor %}
         <tr>
             <th>Total</th>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>
