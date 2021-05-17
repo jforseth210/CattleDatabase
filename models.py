@@ -118,6 +118,13 @@ class Transaction(db.Model):
     def get_date(self):
         return self.event.date
 
+    def get_formatted_price(self):
+        return "${:,.2f}".format(self.price)
+
+
+    def get_formatted_total(self):
+        return "${:,.2f}".format(self.price * len(self.cows))
+
     def search(self, query, prices=[], names=[]):
         query_match = query.lower() in repr(self).lower()
         price_match = not prices or self.price in prices

@@ -59,7 +59,11 @@ def show_event(event_id):
 @app.route("/transactions")
 def transactions():
     transactions = Transaction.query.all()
-    return render_template("transactions.html", transactions=transactions)
+    total = sum(
+        transaction.price * len(transaction.cows) for transaction in transactions
+    )
+    formatted_total = "${:,.2f}".format(total)
+    return render_template("transactions.html", transactions=transactions,formatted_total=formatted_total,unformatted_total=total)
 
 
 @app.route("/transaction/<transaction_id>")
