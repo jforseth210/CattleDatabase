@@ -10,6 +10,13 @@ calendar = db.Table('calendar',
                               db.ForeignKey('event.event_id'))
                     )
 
+transaction_cows = db.Table('transaction_cows',
+                    db.Column('cow_id', db.Integer,
+                              db.ForeignKey('cow.cow_id')),
+                    db.Column('transaction_id', db.Integer,
+                              db.ForeignKey('transaction.transaction_id'))
+                    )
+
 
 class Cow(db.Model):
     cow_id = db.Column(db.Integer, primary_key=True)
@@ -112,8 +119,11 @@ class Transaction(db.Model):
     event = db.relationship(
         'Event', backref=db.backref('transactions', lazy=True))
 
+    cows = db.relationship("Cow", secondary=transaction_cows,
+                             backref=db.backref('cows', lazy='dynamic'))
+
     def get_cows(self):
-        return [transaction for transaction in self.event.cows]
+        return self.cows
 
     def get_date(self):
         return self.event.date

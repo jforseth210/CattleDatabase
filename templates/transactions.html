@@ -2,38 +2,45 @@
 {% block title%}Cattle Records{% endblock %}
 {% block content %}
 <div class="container-fluid">
-<table class=table>
-    <tr>
-        <th>Date</th>
-        <th>To/From</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Price</th>
-    </tr>
-    {% for transaction in transactions %}
-    <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
-        <td>
-            <h7>{{transaction.event.date}}</h7>
-        </td>
-        <td>
-            <h7>{{transaction.tofrom}}</h7>
-        </td>
-        <td>
-            <h7>{{transaction.name}}</h7>
-        </td>
-        <td>
-            <h7>{{ transaction.description }}<h7>
-        </td>
-        <td>
-            <h7 class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">{{ transaction.price }}<h7>
-        </td>
-    </tr>
-    {% endfor %}
-    <tr>
-        <th>Total</th>
-        <th></th>
-        <th></th>
-        <th>{{transactions|sum(attribute="price")}}</th>
-    </tr>
-{% endblock %}
-    
+    <table class=table>
+        <tr>
+            <th>Date</th>
+            <th>To/From</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price (single)</th>
+            <th>Price (total)</th>
+        </tr>
+        {% for transaction in transactions %}
+        <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
+            <td>
+                <h7>{{transaction.event.date}}</h7>
+            </td>
+            <td>
+                <h7>{{transaction.tofrom}}</h7>
+            </td>
+            <td>
+                <h7>{{transaction.name}}</h7>
+            </td>
+            <td>
+                <h7>{{ transaction.description }}<h7>
+            </td>
+            <td>
+                <h7 class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">{{
+                    transaction.get_formatted_price() }}<h7>
+            </td>
+            <td>
+                <h7 class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">{{
+                    transaction.get_formatted_total() }}<h7>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th>Total</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th class="{% if unformatted_total >0 %}text-success{% else %}text-danger{%endif%}">{{formatted_total}}</th>
+        </tr>
+        {% endblock %}

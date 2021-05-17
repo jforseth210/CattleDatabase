@@ -77,11 +77,11 @@ content %}
         <div class="col-md-6">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link" id="cows-tab" data-toggle="tab" href="#cows" role="tab" aria-controls="cows"
+                    <a class="nav-link active" id="cows-tab" data-toggle="tab" href="#cows" role="tab" aria-controls="cows"
                         aria-selected="true">Cows</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" id="events-tab" data-toggle="tab" href="#event" role="tab"
+                    <a class="nav-link" id="events-tab" data-toggle="tab" href="#event" role="tab"
                         aria-controls="event" aria-selected="true">Event</a>
                 </li>
             </ul>
@@ -107,12 +107,11 @@ content %}
                         </tr>
                         {% endfor %}
                     </table>
-                    <small><i>Add or remove cows in the <a href="/event/{{transaction.event.event_id}}">event</a></i></small>
-                    <!--<button class="m-2 btn btn-success" data-toggle="modal"
-                        data-target="#transactionAddRemoveCowsModal">Add/Remove Cows</button>-->
+                    <button class="m-2 btn btn-success" data-toggle="modal"
+                        data-target="#transactionAddRemoveCowsModal">Add/Remove Cows</button>
                 </div>
 
-                <div class="tab-pane fade show" id="event" role="tabpanel" aria-labelledby="cows-tab">
+                <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="events-tab">
                     <table class=table>
                         </tr>
                         <th>Date</th>
@@ -181,6 +180,37 @@ content %}
             </div>
         </div>
     </div>
+</div>
+<div class="modal fade" id="transactionAddRemoveCowsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add or Remove Cows from Event</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="transactionAddRemoveCowsForm" method="POST" action="/transactionAddRemoveCows">
+                <input type="hidden" name="transaction" value="{{transaction.transaction_id}}">
+                {% for cow in all_cows %}
+                <div class="form-check">
+                    <input type="checkbox" name="all_cows" value="{{cow.tag_number}}"
+                        id="transactionAddRemoveCows{{cow.tag_number}}" class="form-check-input" {% if cow in transaction.cows
+                        %}checked{%endif%}>
+                    <label for="transactionAddRemoveCows{{cow.tag_number}}"
+                        class="form-check-label">{{cow.tag_number}}</label>
+                </div>
+                {% endfor %}
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <input type="submit" form="transactionAddRemoveCowsForm" class="btn btn-primary" value="Update" />
+        </div>
+    </div>
+</div>
 </div>
 <div class="modal fade" id="tofromChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">

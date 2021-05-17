@@ -72,7 +72,7 @@ def show_transaction(transaction_id):
         transaction_id=transaction_id).first()
     if not transaction:
         return redirect(request.referrer)
-    return render_template("transaction.html", transaction=transaction, cows=Cow.query.all())
+    return render_template("transaction.html", transaction=transaction, all_cows=Cow.query.all())
 
 
 @app.route('/calendar')
@@ -347,13 +347,28 @@ def new_transaction():
         name=name,
         description=description,
         event_id = event_id,
-        tofrom = tofrom
+        tofrom = tofrom,
+        cows = event.cows
     )
 
     db.session.add(new_transaction_object)
     db.session.commit()
     return redirect(request.referrer+"#transactions")
 
+@app.route("/transactionAddRemoveCows", methods=["POST"])
+def transaction_add_remove_cows():
+    all_cows = request.form.getlist("all_cows")
+    new_cow = request.form.get("new_cow")
+
+    transaction_id = request.form.get("transaction")
+
+    transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
+    if all_cows:
+        transaction.cows = [get_cow_from_tag(cow) for cow in all_cows]
+    elif new_cow:
+        transaction.cows.append(get_cow_from_tag(new_cow))
+    db.session.commit()
+    return redirect(request.referrer)
 
 @ app.route("/transactionChangePrice", methods=["POST"])
 def transaction_change_price():
