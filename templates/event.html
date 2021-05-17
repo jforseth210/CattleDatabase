@@ -148,6 +148,11 @@ content %}
             <div class="modal-body">
                 <form id="eventAddRemoveCowsForm" method="POST" action="/eventAddRemoveCows">
                     <input type="hidden" name="event" value="{{event.event_id}}">
+                    <div class="form-check">
+                        <input type="checkbox" name="copyToTransactions" id="copyToTransactions"/>
+                        <label for="copyToTransactions"
+                            class="form-check-label">Copy </label>
+                    </div>
                     {% for cow in cows %}
                     <div class="form-check">
                         <input type="checkbox" name="all_cows" value="{{cow.tag_number}}"
@@ -253,7 +258,7 @@ content %}
                     <input type="text" name="name" class="form-control" />
                     <h5>Amount</h5>
                     <small><i>Negative for expenses/Positive for income</i></small><br />
-                    <input type="number" name="price" cless="form-control" oninput="colorCodePriceInput(this)" />
+                    <input type="number" step=".01" name="price" cless="form-control" oninput="colorCodePriceInput(this)" />
                     <h5>To/From</h5>
                     <input type="text" name="tofrom" class="form-control" />
                     <h5>Additional Information</h5>
