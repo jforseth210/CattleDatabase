@@ -6,6 +6,9 @@ import re
 import socket
 from getpass import getpass
 import werkzeug.security
+import webbrowser
+
+from main import *
 
 PORT = 5000
 UPNP_DESCRIPTION = "CattleDB"
@@ -63,7 +66,11 @@ def show_server():
         print("You're not connected to the internet at the moment,")
         print("but you can still access your records (on this computer) at:")
         print("http://localhost:"+str(PORT))
-
+    print("")
+    if input("Press ENTER to open CattleDB in your default browser... (or type 'c' to cancel): ").lower() not in ["cancel","c"]:
+        webbrowser.open("http://localhost:"+str(PORT))
+    print("")
+    print("Starting the server")
 def get_private_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     # connect to the server on local computer
@@ -76,9 +83,12 @@ def get_public_ip():
     return requests.get("https://www.wikipedia.org").headers["X-Client-IP"]
 
 def get_online():
+    if platform.system() == "Windows":
+        return subprocess.check_output("powershell.exe (get-netconnectionProfile).Name", shell=True).strip().decode("UTF-8") != ""
     subprocess_result = subprocess.Popen('iwgetid',shell=True,stdout=subprocess.PIPE)
     subprocess_output = subprocess_result.communicate()[0],subprocess_result.returncode
     return subprocess_output[0] != b""
+
 def get_network_ssid():
     if platform.system() == "Windows":
         return subprocess.check_output("powershell.exe (get-netconnectionProfile).Name", shell=True).strip().decode("UTF-8")       

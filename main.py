@@ -47,7 +47,6 @@ def home():
 def cows():
     cows = Cow.query.all()
     usernames = get_usernames()
-    print(usernames)
     return render_template("cows.html", cows=cows, usernames=usernames)
 
 
