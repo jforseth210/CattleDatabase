@@ -75,6 +75,10 @@ def get_private_ip():
 def get_public_ip():
     return requests.get("https://www.wikipedia.org").headers["X-Client-IP"]
 
+def get_online():
+    subprocess_result = subprocess.Popen('iwgetid',shell=True,stdout=subprocess.PIPE)
+    subprocess_output = subprocess_result.communicate()[0],subprocess_result.returncode
+    return subprocess_output[0] != b""
 def get_network_ssid():
     if platform.system() == "Windows":
         return subprocess.check_output("powershell.exe (get-netconnectionProfile).Name", shell=True).strip().decode("UTF-8")       
