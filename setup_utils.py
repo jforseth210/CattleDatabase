@@ -9,7 +9,7 @@ import werkzeug.security
 
 PORT = 5000
 UPNP_DESCRIPTION = "CattleDB"
-
+OFFLINE_MESSAGE = "<CURRENTLY OFFLINE>"
 def show_server():
     print(r" ____              __    __    ___           ____    ____")
     print(r"/\  _`\           /\ \__/\ \__/\_ \         /\  _`\ /\  _`\ ")
@@ -25,40 +25,44 @@ def show_server():
     print()
     if not os.path.exists("config.json") or not os.path.exists("cattle.db"):
         setup_cattle_db()
-    still_using_wan = False
-    if get_using_wan():
-        print("Checking that your connection is still configured correctly... this may take a few seconds")
-        still_using_wan = True
-        if check_for_upnp_rule():
-            print("Good to go!")
-            print()
-        else:
-            print("Connection not configured correctly. Attempting to fix!")
-            if add_upnp_rule():
-                print("Fixed! Good to go!")
+    
+    if get_online():
+        still_using_wan = False
+        if get_using_wan():
+            print("Checking that your connection is still configured correctly... this may take a few seconds")
+            still_using_wan = True
+            if check_for_upnp_rule():
+                print("Good to go!")
                 print()
             else:
-                print()
-                print("Whoops! Something went wrong. We couldn't automatically configure your connection.")
-                print(f"Your records will still be accessible on {get_network_ssid()}")
-                print("It may still be possible to set up online access manually!")
-                print("Contact the developer for more information.")
-                print()
-                still_using_wan = False
+                print("Connection not configured correctly. Attempting to fix!")
+                if add_upnp_rule():
+                    print("Fixed! Good to go!")
+                    print()
+                else:
+                    print()
+                    print("Whoops! Something went wrong. We couldn't automatically configure your connection.")
+                    print(f"Your records will still be accessible on {get_network_ssid()}")
+                    print("It may still be possible to set up online access manually!")
+                    print("Contact the developer for more information.")
+                    print()
+                    still_using_wan = False
 
-    if still_using_wan:
-        print("If you are on the same network as this computer ({}), connect using this link:".format(get_network_ssid()))
-        print("http://" + get_private_ip() + ":" + str(PORT))
+        if still_using_wan:
+            print("If you are on the same network as this computer ({}), connect using this link:".format(get_network_ssid()))
+            print("http://" + get_private_ip() + ":" + str(PORT))
+            print()
+            print("If you are on a different network (not {}) connect using:".format(get_network_ssid()))
+            
+            print("http://" + get_public_ip() + ":" + str(PORT))
+        else:
+            print(f"You can access your from any device (as long as it's connected to {get_network_ssid()}) at:")
+            print("http://" + get_private_ip() + ":" + str(PORT))
         print()
-        print("If you are on a different network (not {}) connect using:".format(get_network_ssid()))
-        
-        print("http://" + get_public_ip() + ":" + str(PORT))
     else:
-        print(f"You can access your from any device (as long as it's connected to {get_network_ssid()}) at:")
-        print("http://" + get_private_ip() + ":" + str(PORT))
-    print()
-    #Attempt to silence app.run() output
-    #with contextlib.redirect_stdout(io.StringIO()):
+        print("You're not connected to the internet at the moment,")
+        print("but you can still access your records (on this computer) at:")
+        print("http://localhost:"+str(PORT))
 
 def get_private_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -78,7 +82,7 @@ def get_network_ssid():
     subprocess_result = subprocess.Popen('iwgetid',shell=True,stdout=subprocess.PIPE)
     subprocess_output = subprocess_result.communicate()[0],subprocess_result.returncode
     if subprocess_output[0] == b"":
-        return "<CURRENTLY OFFLINE>"
+        return OFFLINE_MESSAGE
     return re.search(r'"(.*?)"',subprocess_output[0].decode('utf-8')).group(0).replace("\"","")
 
 def setup_cattle_db():
