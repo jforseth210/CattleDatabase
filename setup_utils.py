@@ -1,5 +1,64 @@
+import os
+import json
+import platform
+import subprocess
+import re
+import socket
+from getpass import getpass
+import werkzeug.security
+
 PORT = 5000
 UPNP_DESCRIPTION = "CattleDB"
+
+def show_server():
+    print(r" ____              __    __    ___           ____    ____")
+    print(r"/\  _`\           /\ \__/\ \__/\_ \         /\  _`\ /\  _`\ ")
+    print(r"\ \ \/\_\     __  \ \ ,_\ \ ,_\//\ \      __\ \ \/\ \ \ \ \ \ ")
+    print(r" \ \ \/_/_  /'__`\ \ \ \/\ \ \/ \ \ \   /'__`\ \ \ \ \ \  _ <'")
+    print(r"  \ \ \ \ \/\ \ \.\_\ \ \_\ \ \_ \_\ \_/\  __/\ \ \_\ \ \ \ \ \ ")
+    print(r"   \ \____/\ \__/.\_\\ \__\\ \__\/\____\ \____\\ \____/\ \____/")
+    print(r"    \/___/  \/__/\/_/ \/__/ \/__/\/____/\/____/ \/___/  \/___/")
+    print(r"")
+    print(r"")
+    print(r"")
+    print("Welcome to CattleDB. Just leave this window open and your records will be accessible from any device.")
+    print()
+    if not os.path.exists("config.json") or not os.path.exists("cattle.db"):
+        setup_cattle_db()
+    still_using_wan = False
+    if get_using_wan():
+        print("Checking that your connection is still configured correctly... this may take a few seconds")
+        still_using_wan = True
+        if check_for_upnp_rule():
+            print("Good to go!")
+            print()
+        else:
+            print("Connection not configured correctly. Attempting to fix!")
+            if add_upnp_rule():
+                print("Fixed! Good to go!")
+                print()
+            else:
+                print()
+                print("Whoops! Something went wrong. We couldn't automatically configure your connection.")
+                print(f"Your records will still be accessible on {get_network_ssid()}")
+                print("It may still be possible to set up online access manually!")
+                print("Contact the developer for more information.")
+                print()
+                still_using_wan = False
+
+    if still_using_wan:
+        print("If you are on the same network as this computer ({}), connect using this link:".format(get_network_ssid()))
+        print("http://" + get_private_ip() + ":" + str(PORT))
+        print()
+        print("If you are on a different network (not {}) connect using:".format(get_network_ssid()))
+        
+        print("http://" + get_public_ip() + ":" + str(PORT))
+    else:
+        print(f"You can access your from any device (as long as it's connected to {get_network_ssid()}) at:")
+        print("http://" + get_private_ip() + ":" + str(PORT))
+    print()
+    #Attempt to silence app.run() output
+    #with contextlib.redirect_stdout(io.StringIO()):
 
 def get_private_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -18,7 +77,6 @@ def get_network_ssid():
     # Not Windows. Works on Manjaro, presumably other distros, IDK about MacOS
     subprocess_result = subprocess.Popen('iwgetid',shell=True,stdout=subprocess.PIPE)
     subprocess_output = subprocess_result.communicate()[0],subprocess_result.returncode
-    print(subprocess_output[0])
     if subprocess_output[0] == b"":
         return "<CURRENTLY OFFLINE>"
     return re.search(r'"(.*?)"',subprocess_output[0].decode('utf-8')).group(0).replace("\"","")
@@ -104,11 +162,14 @@ def generate_config():
 
 def create_users():
     print("Please create a username.")
-    print("This will be used to log in, and to")
-    print("highlight the cows you currently own in the system.")
-    print("You can enter multiple usernames, separated by commas (and spaces) like so:")
-    #print("Katie Elder, Tom Elder, John Elder, Matt Elder, Bud Elder")
-    user_strings = input().split(", ")
+    print("This will be used to log in and will be used")
+    print("to distinguish between your cows, and cows")
+    print("owned by others, like the one's you've sold.")
+
+    print("You can create multiple users using commas and spaces (\", \") like so:")
+    print("Jesse James, Billy the Kid, Butch Cassidy")
+    print("")
+    user_strings = input("Enter your name(s): ").split(", ")
     print()
     print("You'll now be prompted to choose a password. (The cursor will not move)")
     print()

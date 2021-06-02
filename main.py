@@ -8,6 +8,7 @@ import sys
 import os
 import platform
 import time
+import logging
 from getpass import getpass
 
 # Trying to get this installed on Windows is agnonizing
@@ -15,6 +16,7 @@ from getpass import getpass
 import miniupnpc
 import requests
 from flask import Flask, render_template, request, redirect, Markup
+import click
 import werkzeug.security
 
 from models import db, Cow, Event, Transaction, SearchResult
@@ -455,53 +457,22 @@ def delete_transaction():
 
 
 if __name__ == "__main__":
-    print(r" ____              __    __    ___           ____    ____")
-    print(r"/\  _`\           /\ \__/\ \__/\_ \         /\  _`\ /\  _`\ ")
-    print(r"\ \ \/\_\     __  \ \ ,_\ \ ,_\//\ \      __\ \ \/\ \ \ \ \ \ ")
-    print(r" \ \ \/_/_  /'__`\ \ \ \/\ \ \/ \ \ \   /'__`\ \ \ \ \ \  _ <'")
-    print(r"  \ \ \ \ \/\ \ \.\_\ \ \_\ \ \_ \_\ \_/\  __/\ \ \_\ \ \ \ \ \ ")
-    print(r"   \ \____/\ \__/.\_\\ \__\\ \__\/\____\ \____\\ \____/\ \____/")
-    print(r"    \/___/  \/__/\/_/ \/__/ \/__/\/____/\/____/ \/___/  \/___/")
-    print(r"")
-    print(r"")
-    print(r"")
-    print("Welcome to CattleDB. Just leave this window open and your records will be accessible from any device.")
-    print()
-    if not os.path.exists("config.json") or not os.path.exists("cattle.db"):
-        setup_cattle_db()
-    still_using_wan = False
-    if get_using_wan():
-        print("Checking that your connection is still configured correctly... this may take a few seconds")
-        still_using_wan = True
-        if check_for_upnp_rule():
-            print("Good to go!")
-            print()
-        else:
-            print("Connection not configured correctly. Attempting to fix!")
-            if add_upnp_rule():
-                print("Fixed! Good to go!")
-                print()
-            else:
-                print()
-                print("Whoops! Something went wrong. We couldn't automatically configure your connection.")
-                print(f"Your records will still be accessible on {get_network_ssid()}")
-                print("It may still be possible to set up online access manually!")
-                print("Contact the developer for more information.")
-                print()
-                still_using_wan = False
+    SHOW_SERVER = True
+    if getattr(sys, 'frozen', False) or SHOW_SERVER:
+        show_server()
+        app.debug=False
 
-    if still_using_wan:
-        print("If you are on the same network as this computer ({}), connect using this link:".format(get_network_ssid()))
-        print("http://" + get_private_ip() + ":" + str(PORT))
-        print()
-        print("If you are on a different network (not {}) connect using:".format(get_network_ssid()))
-        
-        print("http://" + get_public_ip() + ":" + str(PORT))
-    else:
-        print(f"You can access your from any device (as long as it's connected to {get_network_ssid()}) at:")
-        print("http://" + get_private_ip() + ":" + str(PORT))
-    print()
-    print("SERVER LOG: IGNORE UNLESS SOMETHING GOES WRONG")
-    #Attempt to silence app.run() output
-    #with contextlib.redirect_stdout(io.StringIO()):
-    app.run(debug=False, host="0.0.0.0")
+        #Silence server log
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
+
+        def secho(text, file=None, nl=None, err=None, color=None, **styles):
+            pass
+
+        def echo(text, file=None, nl=None, err=None, color=None, **styles):
+            pass
+
+        click.echo = echo
+        click.secho = secho
+
+    app.run(debug=app.debug, host="0.0.0.0")
