@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title%}Login{% endblock %}
+{% block content %}
+<div class="container m-auto">
+    <div class="mx-auto">
+        <div class="col-lg-6 col-md-8 col-sm-10 mx-auto">
+            <div class="card p-4">
+                <form class="mx-auto" action="{{ url_for('simplelogin.login', next=request.args.get('next', '/')) }}" method="POST">
+                    <h2 class="m-1">Log In</h2>
+                    <i class="m-1"><small>Please note: This login is insecure. Please only log in from networks you trust (not hotels, coffee shops, etc).</small></i>
+                    {{ form.csrf_token }}
+                    
+                    <h4 class="m-1">Username</h4>
+                    {{ form.username }}
+                    <h4 class="m-1">Password</h4>
+                    {{ form.password }}
+                    <input type="submit" value="Submit" class="text-center mx-auto mt-3 btn btn-primary w-50" />
+                </form>
+                <script>
+                    document.getElementById("username").classList.add("form-control");
+                    document.getElementById("password").classList.add("form-control");
+                    document.getElementById("username").classList.add("m-1");
+                    document.getElementById("password").classList.add("m-1");
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

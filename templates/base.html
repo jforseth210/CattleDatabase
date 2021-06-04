@@ -1,300 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
 
-    <!-- Bootstrap CSS -->
-    <link
-      rel="stylesheet"
-      href="/static/bootstrap/css/bootstrap.min.css"
-    />
-    <link rel="stylesheet" href="/static/style.css" />
-    <title>{% block title %}{% endblock %}</title>
-    {% block head%}
-    {% endblock %}
-  </head>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-  <body>
-    <nav class="mb-5 navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="/">Cattle Records</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <title>{% block title %}{% endblock %}</title>
+  {% block head%}
+  {% endblock %}
+</head>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/cows"
-              >Cows<span class="sr-only"></span
-            ></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/events"
-              >Events<span class="sr-only"></span
-            ></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/transactions"
-              >Transactions<span class="sr-only"></span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/calendar"
-              >Calendar<span class="sr-only"></span
-            ></a>
-          </li>
-        </ul>
-        <form id="search-form" class="form-inline my-2 my-lg-0" action="/search">
-          <input
-            name="q"
-            class="form-control mr-sm-2"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-            {% if query %}
-            value="{{query}}"
-            {% endif %}
-          />
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
-            Search
+<body>
+  <nav class="mb-5 navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">Cattle Records</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/cows">Cows<span class="sr-only"></span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/events">Events<span class="sr-only"></span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/transactions">Transactions<span class="sr-only"></span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/calendar">Calendar<span class="sr-only"></span></a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto mr-4">
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Log Out<span class="sr-only"></span></a>
+        </li>
+      </ul>
+      <form id="search-form" class="form-inline my-2 my-lg-0" action="/search">
+        <input name="q" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" {% if query
+          %} value="{{query}}" {% endif %} />
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+          Search
+        </button>
+      </form>
+    </div>
+  </nav>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+      <div class="modal fade show" role="dialog">
+        {{message}}
+      </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %} {% endblock %}
+  <div class="modal fade" id="newCowModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Cow</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
           </button>
-        </form>
-      </div>
-    </nav>
-    {% block content %} {% endblock %}
-    <div
-      class="modal fade"
-      id="newCowModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add Cow</h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form
-              id="newCowForm"
-              method="post"
-              action="/newCow"
-              onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))"
-            >
-              <h5>Dam:</h5>
-              <select name="dam" id="newCowDam" class="form-control">
-                {% for cow in cows %} {% if cow.sex in ["Heifer", "Cow"] %}
-                <option>{{cow.tag_number}}</option>
-                {% endif %} {% endfor %}
-                <option value="">N/A</option>
-              </select>
-              <h5>Sire:</h5>
-              <select name="sire" id="newCowSire" class="form-control">
-                {% for cow in cows %} {% if cow.sex == "Bull" %}
-                <option>{{cow.tag_number}}</option>
-                {% endif %} {% endfor %}
-                <option value="">N/A</option>
-              </select>
-              <h5>Tag Number:</h5>
-              <small id="tagAvailabilityText" class="form-text"> </small>
-              <input
-                type="text"
-                name="tag_number"
-                id="newCowTagNumber"
-                class="form-control"
-              />
-              <h5>Owner:</h5>
-              <input
-                name="owner"
-                id="newCowOwner"
-                type="text"
-                class="form-control"
-              />
-              <h5>Sex:</h5>
-              <select name="sex" id="newCowSex" class="form-control">
-                <option>Bull</option>
-                <option>Cow</option>
-                <option>Steer</option>
-                <option>Heifer</option>
-              </select>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <input
-              type="submit"
-              form="newCowForm"
-              class="btn btn-primary"
-              value="Add"
-            />
-          </div>
+        </div>
+        <div class="modal-body">
+          <form id="newCowForm" method="post" action="/newCow"
+            onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))">
+            <h5>Dam:</h5>
+            <select name="dam" id="newCowDam" class="form-control">
+              {% for cow in cows %} {% if cow.sex in ["Heifer", "Cow"] %}
+              <option>{{cow.tag_number}}</option>
+              {% endif %} {% endfor %}
+              <option value="">N/A</option>
+            </select>
+            <h5>Sire:</h5>
+            <select name="sire" id="newCowSire" class="form-control">
+              {% for cow in cows %} {% if cow.sex == "Bull" %}
+              <option>{{cow.tag_number}}</option>
+              {% endif %} {% endfor %}
+              <option value="">N/A</option>
+            </select>
+            <h5>Tag Number:</h5>
+            <small id="tagAvailabilityText" class="form-text"> </small>
+            <input type="text" name="tag_number" id="newCowTagNumber" class="form-control" />
+            <h5>Owner:</h5>
+            <input name="owner" id="newCowOwner" type="text" class="form-control" />
+            <h5>Sex:</h5>
+            <select name="sex" id="newCowSex" class="form-control">
+              <option>Bull</option>
+              <option>Cow</option>
+              <option>Steer</option>
+              <option>Heifer</option>
+            </select>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <input type="submit" form="newCowForm" class="btn btn-primary" value="Add" />
         </div>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="newEventModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add Event</h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form id="newEventForm" method="post" action="/newEvent">
-              <h5>Cows</h5>
-              {% for cow in cows %}
-              <div class="form-check form-check-inline">
-                <input
-                  name="cows"
-                  id="{{cow.cow_id}}"
-                  class="form-check-input"
-                  type="checkbox"
-                  value="{{cow.tag_number}}"
-                />
-                <label for="{{cow.cow_id}}" class="" for="flexCheckDefault">
-                  {{cow.tag_number}}
-                </label>
-              </div>
-              {% endfor %}
-              <h5>Date</h5>
-              <input name="date" type="date" class="form-control" />
-              <h5>Name</h5>
-              <input name="name" type="text" class="form-control" />
-              <h5>Description</h5>
-              <textarea name="description" class="form-control"></textarea>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <input
-              type="submit"
-              form="newEventForm"
-              class="btn btn-primary"
-              value="Add"
-            />
-          </div>
+  </div>
+  <div class="modal fade" id="newEventModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Event</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="newEventForm" method="post" action="/newEvent">
+            <h5>Cows</h5>
+            {% for cow in cows %}
+            <div class="form-check form-check-inline">
+              <input name="cows" id="{{cow.cow_id}}" class="form-check-input" type="checkbox"
+                value="{{cow.tag_number}}" />
+              <label for="{{cow.cow_id}}" class="" for="flexCheckDefault">
+                {{cow.tag_number}}
+              </label>
+            </div>
+            {% endfor %}
+            <h5>Date</h5>
+            <input name="date" type="date" class="form-control" />
+            <h5>Name</h5>
+            <input name="name" type="text" class="form-control" />
+            <h5>Description</h5>
+            <textarea name="description" class="form-control"></textarea>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <input type="submit" form="newEventForm" class="btn btn-primary" value="Add" />
         </div>
       </div>
     </div>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script
-      src="/static/bootstrap/js/Optional Dependencies/jquery-3.4.1.slim.min.js"
-      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="/static/bootstrap/js/Optional Dependencies/popper.min.js"
-      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="/static/bootstrap/js/bootstrap.min.js"
-      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-      crossorigin="anonymous"
-    ></script>
-    <script>
-      function validateTagNumber(field) {
-        console.log("Checking if " + field.value + " available");
-        const Http = new XMLHttpRequest();
-        const url = "/cowexists/" + field.value;
-        Http.open("GET", url);
-        Http.send();
-        Http.onreadystatechange = (e) => {
-          if (field.value == "") {
-            let message = document.getElementById("tagAvailabilityText");
-            message.innerHTML = "Tag number can't be blank";
-            message.classList.remove("text-success");
-            message.classList.add("text-danger");
-            return false;
-          } else if (Http.responseText == "True") {
-            let message = document.getElementById("tagAvailabilityText");
-            message.innerHTML = field.value + " isn't available.";
-            message.classList.remove("text-success");
-            message.classList.add("text-danger");
-            return false;
-          } else if (Http.responseText == "False") {
-            let message = document.getElementById("tagAvailabilityText");
-            message.innerHTML = field.value + " is available.";
-            message.classList.remove("text-danger");
-            message.classList.add("text-success");
-            return true;
-          }
-        };
-      }
+  </div>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="/static/bootstrap/js/Optional Dependencies/jquery-3.4.1.slim.min.js"></script>
+  <script src="/static/bootstrap/js/Optional Dependencies/popper.min.js"></script>
+  <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+  <script>
+    function validateTagNumber(field) {
+      console.log("Checking if " + field.value + " available");
+      const Http = new XMLHttpRequest();
+      const url = "/cowexists/" + field.value;
+      Http.open("GET", url);
+      Http.send();
+      Http.onreadystatechange = (e) => {
+        if (field.value == "") {
+          let message = document.getElementById("tagAvailabilityText");
+          message.innerHTML = "Tag number can't be blank";
+          message.classList.remove("text-success");
+          message.classList.add("text-danger");
+          return false;
+        } else if (Http.responseText == "True") {
+          let message = document.getElementById("tagAvailabilityText");
+          message.innerHTML = field.value + " isn't available.";
+          message.classList.remove("text-success");
+          message.classList.add("text-danger");
+          return false;
+        } else if (Http.responseText == "False") {
+          let message = document.getElementById("tagAvailabilityText");
+          message.innerHTML = field.value + " is available.";
+          message.classList.remove("text-danger");
+          message.classList.add("text-success");
+          return true;
+        }
+      };
+    }
 
-      document
-        .getElementById("newCowTagNumber")
-        .addEventListener("input", function () {
-          validateTagNumber(this);
-        });
+    document
+      .getElementById("newCowTagNumber")
+      .addEventListener("input", function () {
+        validateTagNumber(this);
+      });
 
-      function checkForEvents(date) {
-        console.log("Checking if event on " + date.value + "");
-        const Http = new XMLHttpRequest();
-        const url = "/dateexists/" + date.value;
-        Http.open("GET", url);
-        Http.send();
-        Http.onreadystatechange = (e) => {
-          message = document.getElementById("dateHelperText");
-          if (Http.status == 200){
-            message.innerHTML = Http.responseText;
-          }
-        };
-      }
+    function checkForEvents(date) {
+      console.log("Checking if event on " + date.value + "");
+      const Http = new XMLHttpRequest();
+      const url = "/dateexists/" + date.value;
+      Http.open("GET", url);
+      Http.send();
+      Http.onreadystatechange = (e) => {
+        message = document.getElementById("dateHelperText");
+        if (Http.status == 200) {
+          message.innerHTML = Http.responseText;
+        }
+      };
+    }
+  </script>
+  {% block js %}{% endblock %}
+</body>
 
-      document
-        .getElementById("cowNewEventDateField")
-        .addEventListener("input", function () {
-          checkForEvents(this);
-        });
-    </script>
-    {% block js %}{% endblock %}
-  </body>
 </html>

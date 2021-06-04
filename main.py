@@ -1,7 +1,7 @@
 import json
 import re
 import subprocess
-import socket 
+import socket
 import contextlib
 import io
 import sys
@@ -16,34 +16,63 @@ from getpass import getpass
 import miniupnpc
 import requests
 from flask import Flask, render_template, request, redirect, Markup
+from flask_simplelogin import SimpleLogin, login_required
 import click
 import werkzeug.security
 
 from models import db, Cow, Event, Transaction, SearchResult
 from search_functions import *
 from setup_utils import *
+from sensitive_data import SECRET_KEY
 
 if getattr(sys, 'frozen', False):
     template_folder = os.path.join(sys._MEIPASS, 'templates')
     static_folder = os.path.join(sys._MEIPASS, 'static')
-    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+    app = Flask(__name__, template_folder=template_folder,
+                static_folder=static_folder)
 else:
     app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cattle.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = SECRET_KEY
+
 db.init_app(app)
 
+
+def login_checker(provided_user):
+    with open("config.json", "r") as file:
+        config_string = file.read()
+    config = json.loads(config_string)
+    users = config["users"]
+    for user in users:
+        if provided_user["username"] == user["username"] and werkzeug.security.check_password_hash(user["hashed_password"], provided_user["password"]):
+            return True
+    return False
+
+messages = {
+    'login_success': 'Logged In',
+    'login_failure': 'Login Failed',
+    'is_logged_in': 'Logged In!',
+    'logout': 'Logged Out',
+    'login_required': 'Please log in first',
+    'access_denied': 'You don\'t have access to this page',
+    'auth_error': 'Something went wrong： {0}'
+}
+
+SimpleLogin(app, login_checker=login_checker, messages=messages)
 
 def get_cow_from_tag(tag):
     return Cow.query.filter_by(tag_number=tag).first()
 
 
 @app.route("/")
+@login_required
 def home():
     return redirect("/cows")
 
 
 @app.route("/cows")
+@login_required
 def cows():
     cows = Cow.query.all()
     usernames = get_usernames()
@@ -51,6 +80,7 @@ def cows():
 
 
 @app.route("/cow/<tag_number>")
+@login_required
 def show_cow(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     if not cow:
@@ -65,7 +95,21 @@ def show_cow(tag_number):
     return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total=transaction_total)
 
 
+@app.route("/api/cow/<tag_number>")
+def show_cow_api(tag_number):
+    cow = Cow.query.filter_by(tag_number=tag_number).first()
+    return json.dumps({
+        "tag_number": cow.tag_number,
+        "owner": cow.owner,
+        "dam": cow.get_dam().tag_number if cow.get_dam() else "N/A",
+        "sire": cow.get_sire().tag_number if cow.get_sire() else "N/A",
+        "sex": cow.sex,
+        "calves": [calf.tag_number for calf in cow.get_calves()] if cow.get_calves() else []
+    })
+
+
 @app.route("/events")
+@login_required
 def events():
     events = Event.query.all()
     cows = Cow.query.all()
@@ -73,6 +117,7 @@ def events():
 
 
 @app.route("/event/<event_id>")
+@login_required
 def show_event(event_id):
     event = Event.query.filter_by(event_id=event_id).first()
     if not event:
@@ -81,6 +126,7 @@ def show_event(event_id):
 
 
 @app.route("/transactions")
+@login_required
 def transactions():
     transactions = Transaction.query.all()
     total = sum(
@@ -91,6 +137,7 @@ def transactions():
 
 
 @app.route("/transaction/<transaction_id>")
+@login_required
 def show_transaction(transaction_id):
     transaction = Transaction.query.filter_by(
         transaction_id=transaction_id).first()
@@ -100,6 +147,7 @@ def show_transaction(transaction_id):
 
 
 @app.route('/calendar')
+@login_required
 def calendar():
     cows = Cow.query.all()
     return render_template('calendar.html', cows=cows)
@@ -121,6 +169,7 @@ def event_api():
 
 
 @app.route("/search")
+@login_required
 def search():
     # Arguments
     query = request.args.get("q")
@@ -168,6 +217,7 @@ def search():
 
 
 @ app.route("/newCow", methods=["POST"])
+@login_required
 def new_cow():
     date = request.form.get('date')
     born_event_enabled = request.form.get('born_event')
@@ -202,6 +252,7 @@ def new_cow():
 
 
 @ app.route("/cowexists/<tag_number>")
+@login_required
 def cow_exists(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
 
@@ -209,6 +260,7 @@ def cow_exists(tag_number):
 
 
 @app.route("/cowChangeTagNumber", methods=["POST"])
+@login_required
 def change_tag_number():
     old_tag_number = request.form.get("old_tag_number")
     new_tag_number = request.form.get("new_tag_number")
@@ -220,6 +272,7 @@ def change_tag_number():
 
 
 @app.route("/deletecow", methods=["POST"])
+@login_required
 def delete_cow():
     tag_number = request.form.get("tag_number")
     cow = Cow.query.filter_by(tag_number=tag_number).first()
@@ -229,6 +282,7 @@ def delete_cow():
 
 
 @app.route("/transferOwnership", methods=["POST"])
+@login_required
 def transferOwnership():
     tag_number = request.form.get("tag_number")
     new_owner = request.form.get("newOwner")
@@ -250,6 +304,7 @@ def transferOwnership():
 
 
 @app.route("/cowAddParent", methods=["POST"])
+@login_required
 def cow_add_parent():
     tag_number = request.form.get("tag_number")
     parent_type = request.form.get("parent_type")
@@ -266,13 +321,12 @@ def cow_add_parent():
 
 
 @ app.route("/newEvent", methods=["POST"])
+@login_required
 def new_event():
     tag = request.form.get('tag_number')
 
-    if tag:
-        cows = [tag]
-    else:
-        cows = request.form.getlist('cows')
+    cows = [tag] if tag else request.form.getlist('cows')
+
     date = request.form.get('date')
     name = request.form.get('name')
     description = request.form.get('description')
@@ -289,6 +343,7 @@ def new_event():
 
 
 @app.route("/dateexists/<date>")
+@login_required
 def check_if_date_exists(date):
     events = Event.query.filter_by(date=date).all()
     if events:
@@ -300,6 +355,7 @@ def check_if_date_exists(date):
 
 
 @app.route("/eventAddRemoveCows", methods=["POST"])
+@login_required
 def event_add_remove_cows():
     all_cows = request.form.getlist("all_cows")
     new_cow = request.form.get("new_cow")
@@ -316,6 +372,7 @@ def event_add_remove_cows():
 
 
 @ app.route("/eventChangeDate", methods=["POST"])
+@login_required
 def event_change_date():
     event_id = request.form.get("event_id")
     date = request.form.get("date")
@@ -327,6 +384,7 @@ def event_change_date():
 
 
 @ app.route("/eventChangeDescription", methods=["POST"])
+@login_required
 def event_change_description():
     event_id = request.form.get("event_id")
     description = request.form.get("description")
@@ -338,6 +396,7 @@ def event_change_description():
 
 
 @ app.route("/eventChangeName", methods=["POST"])
+@login_required
 def event_change_name():
     event_id = request.form.get("event_id")
     name = request.form.get("name")
@@ -349,6 +408,7 @@ def event_change_name():
 
 
 @app.route("/deleteevent", methods=["POST"])
+@login_required
 def delete_event():
     event_id = request.form.get("event_id")
     event = Event.query.filter_by(event_id=event_id).first()
@@ -358,6 +418,7 @@ def delete_event():
 
 
 @ app.route("/newTransaction", methods=["POST"])
+@login_required
 def new_transaction():
     event_id = request.form.get('event_id')
     event = Event.query.filter_by(event_id=event_id).first()
@@ -381,6 +442,7 @@ def new_transaction():
 
 
 @app.route("/transactionAddRemoveCows", methods=["POST"])
+@login_required
 def transaction_add_remove_cows():
     all_cows = request.form.getlist("all_cows")
     new_cow = request.form.get("new_cow")
@@ -398,6 +460,7 @@ def transaction_add_remove_cows():
 
 
 @ app.route("/transactionChangePrice", methods=["POST"])
+@login_required
 def transaction_change_price():
     transaction_id = request.form.get("transaction_id")
     price = request.form.get("price")
@@ -410,6 +473,7 @@ def transaction_change_price():
 
 
 @ app.route("/transactionChangeDescription", methods=["POST"])
+@login_required
 def transaction_change_description():
     transaction_id = request.form.get("transaction_id")
     description = request.form.get("description")
@@ -422,6 +486,7 @@ def transaction_change_description():
 
 
 @ app.route("/transactionChangeName", methods=["POST"])
+@login_required
 def transaction_change_name():
     transaction_id = request.form.get("transaction_id")
     name = request.form.get("name")
@@ -434,6 +499,7 @@ def transaction_change_name():
 
 
 @ app.route("/transactionChangeToFrom", methods=["POST"])
+@login_required
 def transaction_change_to_from():
     transaction_id = request.form.get("transaction_id")
     tofrom = request.form.get("tofrom")
@@ -446,6 +512,7 @@ def transaction_change_to_from():
 
 
 @app.route("/deletetransaction", methods=["POST"])
+@login_required
 def delete_transaction():
     transaction_id = request.form.get("transaction_id")
     transaction = Transaction.query.filter_by(
@@ -454,14 +521,14 @@ def delete_transaction():
     db.session.commit()
     return redirect('/transactions')
 
-
 if __name__ == "__main__":
-    SHOW_SERVER = True
+    SHOW_SERVER = False
+    app.debug = True
     if getattr(sys, 'frozen', False) or SHOW_SERVER:
         show_server()
-        app.debug=False
+        app.debug = False
 
-        #Silence server log
+        # Silence server log
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 

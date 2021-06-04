@@ -162,25 +162,27 @@ content %}
                             <th>Price</th>
                         </tr>
                         {% for event in cow.events %}
-                            {% for transaction in event.transactions %}
-                            <tr class="clickable-tr" onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
-                                <td>
-                                    <h7>{{transaction.event.date}}</h7>
-                                </td>
-                                <td>
-                                    <h7>{{transaction.tofrom}}</h7>
-                                </td>
-                                <td>
-                                    <h7>{{transaction.name}}</h7>
-                                </td>
-                                <td>
-                                    <h7>{{ transaction.description }}<h7>
-                                </td>
-                                <td>
-                                    <h7 class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">{{ transaction.price }}<h7>
-                                </td>
-                            </tr>
-                            {% endfor %}
+                        {% for transaction in event.transactions %}
+                        <tr class="clickable-tr"
+                            onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
+                            <td>
+                                <h7>{{transaction.event.date}}</h7>
+                            </td>
+                            <td>
+                                <h7>{{transaction.tofrom}}</h7>
+                            </td>
+                            <td>
+                                <h7>{{transaction.name}}</h7>
+                            </td>
+                            <td>
+                                <h7>{{ transaction.description }}<h7>
+                            </td>
+                            <td>
+                                <h7 class="{% if transaction.price >0 %}text-success{% else %}text-danger{%endif%}">{{
+                                    transaction.price }}<h7>
+                            </td>
+                        </tr>
+                        {% endfor %}
                         {%endfor%}
                         <tr>
                             <th>Total</th>
@@ -241,7 +243,7 @@ content %}
                     <p>Changing this <i>shouldn't</i> break anything, but it might. Be careful!</p>
                     <form id="tagNumberChangeForm" method="POST" action="/cowChangeTagNumber">
                         <input type="hidden" name="old_tag_number" value="{{cow.tag_number}}">
-                        <input name="new_tag_number" class="form-control" value="{{cow.tag_number}}"/>
+                        <input name="new_tag_number" class="form-control" value="{{cow.tag_number}}" />
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -438,4 +440,11 @@ content %}
             </div>
         </div>
     </div>
+    <script>
+        document
+            .getElementById("cowNewEventDateField")
+            .addEventListener("input", function () {
+                checkForEvents(this);
+            });
+    </script>
     {% endblock %}
