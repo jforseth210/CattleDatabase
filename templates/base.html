@@ -38,9 +38,11 @@
         </li>
       </ul>
       <ul class="navbar-nav ml-auto mr-4">
+        {% if is_logged_in() %}
         <li class="nav-item">
           <a class="nav-link" href="/logout">Log Out<span class="sr-only"></span></a>
         </li>
+        {% endif %}
       </ul>
       <form id="search-form" class="form-inline my-2 my-lg-0" action="/search">
         <input name="q" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" {% if query
@@ -52,13 +54,13 @@
     </div>
   </nav>
   {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      {% for message in messages %}
-      <div class="modal fade show" role="dialog">
-        {{message}}
-      </div>
-      {% endfor %}
-    {% endif %}
+  {% if messages %}
+  {% for message in messages %}
+  <div class="modal fade show" role="dialog">
+    {{message}}
+  </div>
+  {% endfor %}
+  {% endif %}
   {% endwith %}
   {% block content %} {% endblock %}
   <div class="modal fade" id="newCowModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
