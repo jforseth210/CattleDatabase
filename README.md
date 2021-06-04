@@ -26,12 +26,9 @@ Short answer: No, probably not. I'm still an amatuer programmer, and there are p
 
 You can greatly improve your security by leaving online mode disabled. This effectively makes it impossible to "hack" your records without access to your network. 
 
-AS OF 6/1/21, IF YOU CHOOSE TO MAKE YOUR RECORDS AVAILABLE ONLINE, THEY ARE EDITABLE BY ANYONE WHO KNOWS THE ADDRESS. I
-WILL LIKELY ADD A LOGIN FORM IN THE VERY NEAR FUTURE.
-
 There are few security concerns associated with the way this program is designed:
 1) Anyone with access to the host computer (and some technical skills) can access the database, either by modifying the username/password hash stored in config.json or by accessing cattle.db directly. KEEP YOUR HOST COMPUTER SECURE
-2) Logins are (CURRENTLY NOT IMPLEMENTED, BUT WHEN IMPLEMENTED WILL BE) transmitted in plain-text. This means that anyone between the device you're accessing your records from and your host computer could potentially read your password. For example, any cell carrier, internet service provider, or wifi network between you and your host computer, could potentially see your password. USE A UNIQUE PASSWORD, AND ONLY ACCESS YOUR RECORDS ON TRUSTED NETWORKS. 
+2) Logins are transmitted in plain-text. This means that anyone between the device you're accessing your records from and your host computer could potentially read your password. For example, any cell carrier, internet service provider, or wifi network between you and your host computer, could potentially see your password. USE A UNIQUE PASSWORD, AND ONLY ACCESS YOUR RECORDS ON TRUSTED NETWORKS. 
 
 In short, this program is secure enough to dissuade the casual snooper, however it would be fairly easy for a dedicated attacker to gain access when online mode is enabled.
 
