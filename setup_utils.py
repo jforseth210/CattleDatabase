@@ -28,7 +28,7 @@ def show_server():
     print()
     if not os.path.exists("config.json") or not os.path.exists("cattle.db"):
         setup_cattle_db()
-    
+
     if get_online():
         still_using_wan = False
         if get_using_wan():
@@ -56,7 +56,7 @@ def show_server():
             print("http://" + get_private_ip() + ":" + str(PORT))
             print()
             print("If you are on a different network (not {}) connect using:".format(get_network_ssid()))
-            
+
             print("http://" + get_public_ip() + ":" + str(PORT))
         else:
             print(f"You can access your from any device (as long as it's connected to {get_network_ssid()}) at:")
@@ -71,6 +71,7 @@ def show_server():
         webbrowser.open("http://localhost:"+str(PORT))
     print("")
     print("Starting the server")
+    print("Server running...")
 def get_private_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     # connect to the server on local computer
@@ -91,7 +92,7 @@ def get_online():
 
 def get_network_ssid():
     if platform.system() == "Windows":
-        return subprocess.check_output("powershell.exe (get-netconnectionProfile).Name", shell=True).strip().decode("UTF-8")       
+        return subprocess.check_output("powershell.exe (get-netconnectionProfile).Name", shell=True).strip().decode("UTF-8")
     # Not Windows. Works on Manjaro, presumably other distros, IDK about MacOS
     subprocess_result = subprocess.Popen('iwgetid',shell=True,stdout=subprocess.PIPE)
     subprocess_output = subprocess_result.communicate()[0],subprocess_result.returncode
@@ -229,7 +230,7 @@ def upnp_wizard_installed():
 
 def add_upnp_rule():
     try:
-        if platform.system() == "Windows": 
+        if platform.system() == "Windows":
             if not upnp_wizard_installed():
                 prompt_for_upnp_wizard()
             subprocess.run(r'"C:\Program Files (x86)\UPnP Wizard\UPnPWizardC.exe" -add {} -ip {} -intport {} -extport {} -protocol {} -legacy'.format(UPNP_DESCRIPTION, get_private_ip(), PORT, PORT, "TCP"))
@@ -245,7 +246,7 @@ def add_upnp_rule():
     return True
 
 def check_for_upnp_rule():
-    if platform.system() == "Windows": 
+    if platform.system() == "Windows":
         if not upnp_wizard_installed():
             prompt_for_upnp_wizard()
         str(subprocess.check_output(r'"C:\Program Files (x86)\UPnP Wizard\UPnPWizardC.exe" -legacy -list'))
