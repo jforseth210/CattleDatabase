@@ -95,7 +95,8 @@ def show_cow(tag_number):
     return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total=transaction_total)
 
 
-@app.route("/api/cow/<tag_number>")
+@app.route("/api/cow/<tag_number>", methods=["POST"])
+@login_required(basic=True)
 def show_cow_api(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     return json.dumps({
@@ -522,7 +523,7 @@ def delete_transaction():
     return redirect('/transactions')
 
 if __name__ == "__main__":
-    SHOW_SERVER = False
+    SHOW_SERVER = True
     app.debug = True
     if getattr(sys, 'frozen', False) or SHOW_SERVER:
         show_server()
