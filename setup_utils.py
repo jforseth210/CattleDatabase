@@ -52,6 +52,7 @@ def show_server():
                     still_using_wan = False
 
         if still_using_wan:
+            print("MAIN ADDRESS:")
             print("If you are on the same network as this computer ({}), connect using this link (LAN Address):".format(get_network_ssid()))
             print("http://" + get_private_ip() + ":" + str(PORT))
             print()

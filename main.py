@@ -123,6 +123,12 @@ def show_cow_api(tag_number):
             "calves": [calf.tag_number for calf in cow.get_calves()] if cow.get_calves() else []
         })
     return "{}", 404
+@app.route("/api/get_server_info/")
+def get_server_info():
+    return json.dumps({
+        "LAN_address":get_private_ip(),
+        "WAN_address":get_public_ip()
+    })
 @app.route("/events")
 @login_required
 def events():
@@ -537,7 +543,7 @@ def delete_transaction():
     return redirect('/transactions')
 
 if __name__ == "__main__":
-    SHOW_SERVER = True
+    SHOW_SERVER = False
     app.debug = True
     if getattr(sys, 'frozen', False) or SHOW_SERVER:
         show_server()
