@@ -94,21 +94,35 @@ def show_cow(tag_number):
 
     return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total=transaction_total)
 
+@app.route("/api/test_credentials", methods=["POST"])
+@login_required(basic=True)
+def test_credentials():
+    return "True"
+
+@app.route("/api/delete_cow/<tag_number>", methods=["POST"])
+@login_required(basic=True)
+def api_delete_cow(tag_number):
+    tag_number = tag_number.replace("+"," ")
+    cow = Cow.query.filter_by(tag_number=tag_number).first()
+    db.session.delete(cow)
+    db.session.commit()
+    return "True"
 
 @app.route("/api/cow/<tag_number>", methods=["POST"])
 @login_required(basic=True)
 def show_cow_api(tag_number):
+    tag_number = tag_number.replace("+"," ")
     cow = Cow.query.filter_by(tag_number=tag_number).first()
-    return json.dumps({
-        "tag_number": cow.tag_number,
-        "owner": cow.owner,
-        "dam": cow.get_dam().tag_number if cow.get_dam() else "N/A",
-        "sire": cow.get_sire().tag_number if cow.get_sire() else "N/A",
-        "sex": cow.sex,
-        "calves": [calf.tag_number for calf in cow.get_calves()] if cow.get_calves() else []
-    })
-
-
+    if cow:
+        return json.dumps({
+            "tag_number": cow.tag_number,
+            "owner": cow.owner,
+            "dam": cow.get_dam().tag_number if cow.get_dam() else "N/A",
+            "sire": cow.get_sire().tag_number if cow.get_sire() else "N/A",
+            "sex": cow.sex,
+            "calves": [calf.tag_number for calf in cow.get_calves()] if cow.get_calves() else []
+        })
+    return "{}", 404
 @app.route("/events")
 @login_required
 def events():

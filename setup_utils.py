@@ -52,14 +52,14 @@ def show_server():
                     still_using_wan = False
 
         if still_using_wan:
-            print("If you are on the same network as this computer ({}), connect using this link:".format(get_network_ssid()))
+            print("If you are on the same network as this computer ({}), connect using this link (LAN Address):".format(get_network_ssid()))
             print("http://" + get_private_ip() + ":" + str(PORT))
             print()
-            print("If you are on a different network (not {}) connect using:".format(get_network_ssid()))
+            print("If you are on a different network (not {}) connect using this link (WAN Address):".format(get_network_ssid()))
 
             print("http://" + get_public_ip() + ":" + str(PORT))
         else:
-            print(f"You can access your from any device (as long as it's connected to {get_network_ssid()}) at:")
+            print(f"You can access your from any device (as long as it's connected to {get_network_ssid()}) at (LAN Address):")
             print("http://" + get_private_ip() + ":" + str(PORT))
         print()
     else:
