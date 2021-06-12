@@ -9,6 +9,7 @@ import os
 import platform
 import time
 import logging
+import urllib.parse
 from getpass import getpass
 
 # Trying to get this installed on Windows is agnonizing
@@ -102,16 +103,34 @@ def test_credentials():
 @app.route("/api/delete_cow/<tag_number>", methods=["POST"])
 @login_required(basic=True)
 def api_delete_cow(tag_number):
-    tag_number = tag_number.replace("+"," ")
+    tag_number =  urllib.parse.unquote(tag_number)
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     db.session.delete(cow)
     db.session.commit()
     return "True"
-
+@app.route("/api/add_cow/<new_cow_json>", methods=["POST"])
+@login_required(basic=True)
+def add_cow_api(new_cow_json):
+    new_cow_json =  urllib.parse.unquote(new_cow_json)
+    new_cow_dict = json.loads(new_cow_json)
+    print(new_cow_dict)
+    cow = Cow(
+        dam_id=Cow.query.filter_by(tag_number=new_cow_dict["dam"]).first().cow_id,
+        sire_id=Cow.query.filter_by(tag_number=new_cow_dict["sire"]).first().cow_id,
+        tag_number=new_cow_dict["tag_number"],
+        owner=new_cow_dict["owner"],
+        sex=new_cow_dict["sex"]
+    )
+    db.session.add(cow)
+    db.session.commit()
+    return json.dumps({
+        "operation":"add_cow",
+        "result":"success"
+    })
 @app.route("/api/cow/<tag_number>", methods=["POST"])
 @login_required(basic=True)
 def show_cow_api(tag_number):
-    tag_number = tag_number.replace("+"," ")
+    tag_number =  urllib.parse.unquote(tag_number)
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     if cow:
         return json.dumps({
@@ -129,6 +148,19 @@ def get_server_info():
         "LAN_address":get_private_ip(),
         "WAN_address":get_public_ip()
     })
+
+@app.route("/api/get_possible_parents/sire", methods=["POST"])
+@login_required(basic=True)
+def get_possible_sires():
+    cows = Cow.query.all()
+    return json.dumps({"parent_type":"sire", "parents":[cow.tag_number for cow in cows if cow.sex == "Bull"]})
+
+@app.route("/api/get_possible_parents/dam", methods=["POST"])
+@login_required(basic=True)
+def get_possible_dams():
+    cows = Cow.query.all()
+    return json.dumps({"parent_type":"dam", "parents":[cow.tag_number for cow in cows if cow.sex in ["Cow", "Heifer"]]})
+
 @app.route("/events")
 @login_required
 def events():
