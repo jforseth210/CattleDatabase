@@ -8,7 +8,9 @@ from getpass import getpass
 import werkzeug.security
 import webbrowser
 
-from main import *
+import requests
+import miniupnpc
+
 
 PORT = 5000
 UPNP_DESCRIPTION = "CattleDB"

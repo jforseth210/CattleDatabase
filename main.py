@@ -25,6 +25,7 @@ from models import db, Cow, Event, Transaction, SearchResult
 from search_functions import *
 from setup_utils import *
 from sensitive_data import SECRET_KEY
+from api import api
 
 if getattr(sys, 'frozen', False):
     template_folder = os.path.join(sys._MEIPASS, 'templates')
@@ -36,6 +37,8 @@ else:
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cattle.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = SECRET_KEY
+
+app.register_blueprint(api, url_prefix='/api')
 
 db.init_app(app)
 
@@ -94,72 +97,6 @@ def show_cow(tag_number):
             transaction_total += transaction.price
 
     return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total=transaction_total)
-
-@app.route("/api/test_credentials", methods=["POST"])
-@login_required(basic=True)
-def test_credentials():
-    return "True"
-
-@app.route("/api/delete_cow/<tag_number>", methods=["POST"])
-@login_required(basic=True)
-def api_delete_cow(tag_number):
-    tag_number =  urllib.parse.unquote(tag_number)
-    cow = Cow.query.filter_by(tag_number=tag_number).first()
-    db.session.delete(cow)
-    db.session.commit()
-    return "True"
-@app.route("/api/add_cow/<new_cow_json>", methods=["POST"])
-@login_required(basic=True)
-def add_cow_api(new_cow_json):
-    new_cow_json =  urllib.parse.unquote(new_cow_json)
-    new_cow_dict = json.loads(new_cow_json)
-    print(new_cow_dict)
-    cow = Cow(
-        dam_id=Cow.query.filter_by(tag_number=new_cow_dict["dam"]).first().cow_id,
-        sire_id=Cow.query.filter_by(tag_number=new_cow_dict["sire"]).first().cow_id,
-        tag_number=new_cow_dict["tag_number"],
-        owner=new_cow_dict["owner"],
-        sex=new_cow_dict["sex"]
-    )
-    db.session.add(cow)
-    db.session.commit()
-    return json.dumps({
-        "operation":"add_cow",
-        "result":"success"
-    })
-@app.route("/api/cow/<tag_number>", methods=["POST"])
-@login_required(basic=True)
-def show_cow_api(tag_number):
-    tag_number =  urllib.parse.unquote(tag_number)
-    cow = Cow.query.filter_by(tag_number=tag_number).first()
-    if cow:
-        return json.dumps({
-            "tag_number": cow.tag_number,
-            "owner": cow.owner,
-            "dam": cow.get_dam().tag_number if cow.get_dam() else "N/A",
-            "sire": cow.get_sire().tag_number if cow.get_sire() else "N/A",
-            "sex": cow.sex,
-            "calves": [calf.tag_number for calf in cow.get_calves()] if cow.get_calves() else []
-        })
-    return "{}", 404
-@app.route("/api/get_server_info/")
-def get_server_info():
-    return json.dumps({
-        "LAN_address":get_private_ip(),
-        "WAN_address":get_public_ip()
-    })
-
-@app.route("/api/get_possible_parents/sire", methods=["POST"])
-@login_required(basic=True)
-def get_possible_sires():
-    cows = Cow.query.all()
-    return json.dumps({"parent_type":"sire", "parents":[cow.tag_number for cow in cows if cow.sex == "Bull"]})
-
-@app.route("/api/get_possible_parents/dam", methods=["POST"])
-@login_required(basic=True)
-def get_possible_dams():
-    cows = Cow.query.all()
-    return json.dumps({"parent_type":"dam", "parents":[cow.tag_number for cow in cows if cow.sex in ["Cow", "Heifer"]]})
 
 @app.route("/events")
 @login_required
@@ -575,7 +512,7 @@ def delete_transaction():
     return redirect('/transactions')
 
 if __name__ == "__main__":
-    SHOW_SERVER = False
+    SHOW_SERVER = True
     app.debug = True
     if getattr(sys, 'frozen', False) or SHOW_SERVER:
         show_server()
