@@ -15,7 +15,7 @@ import miniupnpc
 PORT = 5000
 UPNP_DESCRIPTION = "CattleDB"
 OFFLINE_MESSAGE = "<CURRENTLY OFFLINE>"
-def show_server():
+def show_server(headless):
     print(r" ____              __    __    ___           ____    ____")
     print(r"/\  _`\           /\ \__/\ \__/\_ \         /\  _`\ /\  _`\ ")
     print(r"\ \ \/\_\     __  \ \ ,_\ \ ,_\//\ \      __\ \ \/\ \ \ \ \ \ ")
@@ -70,7 +70,7 @@ def show_server():
         print("but you can still access your records (on this computer) at:")
         print("http://localhost:"+str(PORT))
     print("")
-    if input("Press ENTER to open CattleDB in your default browser... (or type 'c' to cancel): ").lower() not in ["cancel","c"]:
+    if not headless:
         webbrowser.open("http://localhost:"+str(PORT))
     print("")
     print("Starting the server")

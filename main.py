@@ -11,6 +11,7 @@ import time
 import logging
 import urllib.parse
 from getpass import getpass
+import argparse
 
 # Trying to get this installed on Windows is agnonizing
 # This might help: https://github.com/miniupnp/miniupnp/issues/159
@@ -134,7 +135,6 @@ def show_transaction(transaction_id):
     if not transaction:
         return redirect(request.referrer)
     return render_template("transaction.html", transaction=transaction, all_cows=Cow.query.all())
-
 
 @app.route('/calendar')
 @login_required
@@ -509,13 +509,20 @@ def delete_transaction():
         transaction_id=transaction_id).first()
     db.session.delete(transaction)
     db.session.commit()
+
     return redirect('/transactions')
 
 if __name__ == "__main__":
-    SHOW_SERVER = True
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--headless", action="store_true", help="Run the server without opening it in browser")
+    parser.add_argument("--show_log", action="store_true", help="Show default flask server information")
+    args = parser.parse_args()
+
+    SHOW_SERVER = not args.show_log
     app.debug = True
+
     if getattr(sys, 'frozen', False) or SHOW_SERVER:
-        show_server()
+        show_server(args.headless)
         app.debug = False
 
         # Silence server log
