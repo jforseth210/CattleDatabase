@@ -134,3 +134,14 @@ def transfer_ownership_api(transfer_ownership_json):
     db.session.add(sale_transaction)
     db.session.commit()
     return "{'succeeded':'True'}"
+
+
+@api.route("/get_cow_list/", methods=["POST"])
+@login_required(basic=True)
+def get_cow_list():
+    cows = Cow.query.all()
+    cow_tag_numbers = [cow.tag_number for cow in cows]
+    sorted(cow_tag_numbers)
+    return json.dumps({
+        "cows":cow_tag_numbers
+    })
