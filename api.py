@@ -4,7 +4,7 @@ import json
 from flask import Blueprint, request
 from flask_simplelogin import login_required
 
-from models import db, Cow
+from models import db, Cow, Transaction, Event
 from setup_utils import get_private_ip, get_public_ip
 
 api = Blueprint('api', __name__, template_folder='templates')
@@ -107,8 +107,30 @@ def add_parent_api(new_parent_json):
 @api.route("/change_tag/<tag_change_json>", methods=["POST"])
 @login_required(basic=True)
 def change_tag_api(tag_change_json):
+    tag_change_json = urllib.parse.unquote(tag_change_json)
     tag_change_dict = json.loads(tag_change_json)
     cow = Cow.query.filter_by(tag_number=tag_change_dict["old_tag"]).first()
     cow.tag_number = tag_change_dict["new_tag"]
+    db.session.commit()
+    return "{'succeeded':'True'}"
+
+@api.route("/transfer_ownership/<transfer_ownership_json>", methods=["POST"])
+@login_required(basic=True)
+def transfer_ownership_api(transfer_ownership_json):
+    transfer_ownership_json_ = urllib.parse.unquote(transfer_ownership_json)
+    transfer_ownership_dict = json.loads(transfer_ownership_json)
+
+    transfer_ownership_dict["description"] = transfer_ownership_dict["description"].replace("+"," ")
+
+    cow = Cow.query.filter_by(tag_number=transfer_ownership_dict["tag_number"]).first()
+    sale_transaction = Transaction(
+        name="Sold", description=f"{cow.owner} sold {cow.tag_number}: {transfer_ownership_dict['description']}", price=transfer_ownership_dict["price"], tofrom=transfer_ownership_dict["new_owner"])
+    sale_event = Event(date=transfer_ownership_dict["date"], name="Transfer",
+                       description=f"Transfer {cow.tag_number} from {cow.owner} to {transfer_ownership_dict['new_owner']}:\n{transfer_ownership_dict['description']}", cows=[cow], transactions=[sale_transaction])
+
+    cow.owner = transfer_ownership_dict['new_owner']
+
+    db.session.add(sale_event)
+    db.session.add(sale_transaction)
     db.session.commit()
     return "{'succeeded':'True'}"
