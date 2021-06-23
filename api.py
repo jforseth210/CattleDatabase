@@ -68,7 +68,7 @@ def show_cow_api(tag_number):
         })
     return "{}", 404
 
-@api.route("/get_server_info/")
+@api.route("/get_server_info", methods=["POST"])
 def get_server_info():
     return json.dumps({
         "LAN_address": get_private_ip(),
