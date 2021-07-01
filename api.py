@@ -141,7 +141,8 @@ def transfer_ownership_api(transfer_ownership_json):
 def get_cow_list():
     cows = Cow.query.all()
     cow_tag_numbers = [cow.tag_number for cow in cows]
-    sorted(cow_tag_numbers)
+    print(cow_tag_numbers)
+    cow_tag_numbers.sort()
     return json.dumps({
         "cows":cow_tag_numbers
     })
