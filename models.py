@@ -159,3 +159,6 @@ class SearchResult():
         self.title = title
         self.body = Markup(body)
         self.url = url
+
+def get_cow_from_tag(tag):
+    return Cow.query.filter_by(tag_number=tag).first()

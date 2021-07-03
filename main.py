@@ -22,7 +22,7 @@ from flask_simplelogin import SimpleLogin, login_required
 import click
 import werkzeug.security
 
-from models import db, Cow, Event, Transaction, SearchResult
+from models import db, Cow, Event, Transaction, SearchResult, get_cow_from_tag
 from search_functions import *
 from setup_utils import *
 from sensitive_data import SECRET_KEY
@@ -66,8 +66,6 @@ messages = {
 
 SimpleLogin(app, login_checker=login_checker, messages=messages)
 
-def get_cow_from_tag(tag):
-    return Cow.query.filter_by(tag_number=tag).first()
 
 
 @app.route("/")
