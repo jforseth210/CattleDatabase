@@ -4,7 +4,7 @@ import json
 from flask import Blueprint, request
 from flask_simplelogin import login_required
 
-from models import db, Cow, Transaction, Event
+from models import db, Cow, Transaction, Event, get_cow_from_tag
 from setup_utils import get_private_ip, get_public_ip
 
 api = Blueprint('api', __name__, template_folder='templates')
@@ -34,17 +34,26 @@ def add_cow_api(new_cow_json):
     else:
         dam_id = Cow.query.filter_by(tag_number=new_cow_dict["dam"]).first().cow_id
     if new_cow_dict["sire"] == "Not+Applicable":
-        print("Sire is N/A")
         sire_id = "N/A"
     else:
         sire_id = Cow.query.filter_by(tag_number=new_cow_dict["sire"]).first().cow_id
     cow = Cow(
         dam_id=dam_id,
         sire_id=sire_id,
-        tag_number=new_cow_dict["tag_number"],
-        owner=new_cow_dict["owner"],
+        tag_number=new_cow_dict["tag_number"].replace("+", " "),
+        owner=new_cow_dict["owner"].replace("+", " "),
         sex=new_cow_dict["sex"]
     )
+    if (new_cow_dict.get("born_event", False)):
+        born_event = Event(
+            date=new_cow_dict['date'], name="Born", description=f"{new_cow_dict['dam']} gave birth to {new_cow_dict['tag_number']}", cows=[cow])
+        db.session.add(born_event)
+
+    if (new_cow_dict.get("calved_event", False)):
+        calved_event = Event(date=new_cow_dict['date'], name="Calved", description=f"{new_cow_dict['dam']} gave birth to {new_cow_dict['tag_number']}", cows=[
+                             get_cow_from_tag(new_cow_dict['dam'])])
+        db.session.add(calved_event)
+
     db.session.add(cow)
     db.session.commit()
     return json.dumps({
