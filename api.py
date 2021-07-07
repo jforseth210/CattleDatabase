@@ -73,7 +73,7 @@ def show_cow_api(tag_number):
             "dam": cow.get_dam().tag_number if cow.get_dam() else "N/A",
             "sire": cow.get_sire().tag_number if cow.get_sire() else "N/A",
             "sex": cow.sex,
-            "calves": [calf.tag_number for calf in cow.get_calves()] if cow.get_calves() else []
+            "calves": [(calf.tag_number, calf.sex) for calf in cow.get_calves()] if cow.get_calves() else []
         })
     return "{}", 404
 
@@ -149,7 +149,7 @@ def transfer_ownership_api(transfer_ownership_json):
 @login_required(basic=True)
 def get_cow_list():
     cows = Cow.query.all()
-    cow_tag_numbers = [cow.tag_number for cow in cows]
+    cow_tag_numbers = [(cow.tag_number, cow.sex) for cow in cows]
     print(cow_tag_numbers)
     cow_tag_numbers.sort()
     return json.dumps({
