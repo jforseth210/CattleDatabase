@@ -95,6 +95,10 @@ def get_possible_sires():
 def get_possible_dams():
     cows = Cow.query.all()
     return json.dumps({"parent_type": "dam", "parents": [cow.tag_number for cow in cows if cow.sex in COW_SEXES_FEMALE_POSSIBLE_PARENTS]})
+@api.route("/get_sex_list/", methods=["POST"])
+@login_required(basic=True)
+def get_sex_list():
+    return json.dumps({"sexes":COW_SEXES})
 
 @api.route("/add_parent/<new_parent_json>", methods=["POST"])
 @login_required(basic=True)
