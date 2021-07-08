@@ -2,7 +2,23 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Markup
 import re
 db = SQLAlchemy()
-
+COW_SEXES_FEMALE_POSSIBLE_PARENTS = (
+    "Cow",
+    "Heifer",
+    "Heifer (Replacement)" 
+)
+COW_SEXES_FEMALE_IMPOSSIBLE_PARENTS = (
+    "Heifer (Market)",
+    "Free-Martin"
+)
+COW_SEXES_FEMALE = COW_SEXES_FEMALE_POSSIBLE_PARENTS + COW_SEXES_FEMALE_IMPOSSIBLE_PARENTS
+COW_SEXES_MALE_POSSIBLE_PARENTS = (
+    "Bull", 
+    "Bull (AI)"
+)
+COW_SEXES_MALE_IMPOSSIBLE_PARENTS = ("Steer",)
+COW_SEXES_MALE = COW_SEXES_MALE_POSSIBLE_PARENTS + COW_SEXES_MALE_IMPOSSIBLE_PARENTS
+COW_SEXES = COW_SEXES_FEMALE + COW_SEXES_MALE
 calendar = db.Table('calendar',
                     db.Column('cow_id', db.Integer,
                               db.ForeignKey('cow.cow_id')),
@@ -11,11 +27,11 @@ calendar = db.Table('calendar',
                     )
 
 transaction_cows = db.Table('transaction_cows',
-                    db.Column('cow_id', db.Integer,
-                              db.ForeignKey('cow.cow_id')),
-                    db.Column('transaction_id', db.Integer,
-                              db.ForeignKey('transaction.transaction_id'))
-                    )
+                            db.Column('cow_id', db.Integer,
+                                      db.ForeignKey('cow.cow_id')),
+                            db.Column('transaction_id', db.Integer,
+                                      db.ForeignKey('transaction.transaction_id'))
+                            )
 
 
 class Cow(db.Model):
@@ -47,7 +63,7 @@ class Cow(db.Model):
 
     def get_events(self):
         return self.events
-    
+
     def get_transactions(self):
         transactions = []
         for event in self.events:
@@ -123,7 +139,7 @@ class Transaction(db.Model):
         'Event', backref=db.backref('transactions', lazy=True))
 
     cows = db.relationship("Cow", secondary=transaction_cows,
-                             backref=db.backref('cows', lazy='dynamic'))
+                           backref=db.backref('cows', lazy='dynamic'))
 
     def get_cows(self):
         return self.cows
@@ -133,7 +149,6 @@ class Transaction(db.Model):
 
     def get_formatted_price(self):
         return "${:,.2f}".format(self.price)
-
 
     def get_formatted_total(self):
         return "${:,.2f}".format(self.price * len(self.cows))
@@ -148,6 +163,7 @@ class Transaction(db.Model):
         if query:
             return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/transaction/{self.transaction_id}")
         return SearchResult(self.name, repr(self), f"/transaction/{self.transaction_id}")
+
     def __repr__(self):
         if self.price > 0:
             return f"Transaction: ${self.price} from {self.tofrom} for {self.name} -{self.description}"
@@ -159,6 +175,7 @@ class SearchResult():
         self.title = title
         self.body = Markup(body)
         self.url = url
+
 
 def get_cow_from_tag(tag):
     return Cow.query.filter_by(tag_number=tag).first()

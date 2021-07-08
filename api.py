@@ -4,7 +4,7 @@ import json
 from flask import Blueprint, request
 from flask_simplelogin import login_required
 
-from models import db, Cow, Transaction, Event, get_cow_from_tag
+from models import db, Cow, Transaction, Event, get_cow_from_tag, COW_SEXES_FEMALE_POSSIBLE_PARENTS, COW_SEXES_MALE_POSSIBLE_PARENTS, COW_SEXES
 from setup_utils import get_private_ip, get_public_ip
 
 api = Blueprint('api', __name__, template_folder='templates')
@@ -88,13 +88,13 @@ def get_server_info():
 @login_required(basic=True)
 def get_possible_sires():
     cows = Cow.query.all()
-    return json.dumps({"parent_type": "sire", "parents": [cow.tag_number for cow in cows if cow.sex == "Bull"]})
+    return json.dumps({"parent_type": "sire", "parents": [cow.tag_number for cow in cows if cow.sex in COW_SEXES_MALE_POSSIBLE_PARENTS]})
 
 @api.route("/get_possible_parents/dam", methods=["POST"])
 @login_required(basic=True)
 def get_possible_dams():
     cows = Cow.query.all()
-    return json.dumps({"parent_type": "dam", "parents": [cow.tag_number for cow in cows if cow.sex in ["Cow", "Heifer"]]})
+    return json.dumps({"parent_type": "dam", "parents": [cow.tag_number for cow in cows if cow.sex in COW_SEXES_FEMALE_POSSIBLE_PARENTS]})
 
 @api.route("/add_parent/<new_parent_json>", methods=["POST"])
 @login_required(basic=True)

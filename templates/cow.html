@@ -84,7 +84,7 @@ content %}
                         <th>Born</th>
                         <th>Owner</th>
                         <th>Sex</th>
-                        {% if cow.sex in ["Cow", "Heifer"] %}
+                        {% if cow.sex in COW_SEXES_FEMALE %}
                         <th>
                             Sire
                         </th>
@@ -109,7 +109,7 @@ content %}
                             <td>
                                 <h7>{{ calf.sex }}<h7>
                             </td>
-                            {% if cow.sex in ["Cow", "Heifer"] %}
+                            {% if cow.sex in COW_SEXES_FEMALE %}
                             <td>
                                 <h7>{{ calf.get_sire().tag_number }}</h7>
                             </td>
@@ -312,7 +312,7 @@ content %}
                         <input name="parent_type" value="Dam" hidden />
                         <h5>Dam</h5>
                         <select name="parent_tag" class="form-control">
-                            {% for cow in cows %} {% if cow.sex in ["Heifer", "Cow"] %}
+                            {% for cow in cows %} {% if cow.sex in COW_SEXES_FEMALE_POSSIBLE_PARENTS %}
                             <option>{{cow.tag_number}}</option>
                             {% endif %} {% endfor %}
                             <option value="">N/A</option>
@@ -321,7 +321,7 @@ content %}
                         <h5>Sire</h5>
                         <input name="parent_type" value="Sire" hidden />
                         <select name="parent_tag" id="newCowSire" class="form-control">
-                            {% for cow in cows %} {% if cow.sex == "Bull" %}
+                            {% for cow in cows %} {% if cow.sex in COW_SEXES_MALE_POSSIBLE_PARENTS %}
                             <option>{{cow.tag_number}}</option>
                             {% endif %} {% endfor %}
                             <option value="">N/A</option>
@@ -358,18 +358,18 @@ content %}
                             <input type="checkbox" name="born_event" id="born_event" class="form-check-input" checked>
                             <label for="born_event" class="form-check-label">Add "born" event for calf</label>
                         </div>
-                        {% if cow.sex in ["Cow", "Heifer"] %}
+                        {% if cow.sex in COW_SEXES_FEMALE %}
                         <div class="form-check">
                             <input type="checkbox" name="calved_event" id="calved_event" class="form-check-input"
                                 checked>
                             <label for="calved_event" class="form-check-label">Add "calved" event for cow</label>
                         </div>
                         {% endif%}
-                        {% if cow.sex in ["Cow", "Heifer"] %}
+                        {% if cow.sex in COW_SEXES_FEMALE %}
                         <h5>Sire:</h5>
                         <select name="sire" id="newCowSire" class="form-control">
                             {% for cowi in cows %}
-                            {% if cowi.sex == "Bull" %}
+                            {% if cowi.sex in COW_SEXES_MALE_POSSIBLE_PARENTS %}
                             <option>{{cowi.tag_number}}</option>
                             {% endif %}
                             {% endfor %}
@@ -380,7 +380,7 @@ content %}
                         <h5>Dam:</h5>
                         <select name="dam" id="newCowDam" class="form-control">
                             {% for cowi in cows %}
-                            {% if cowi.sex in ["Heifer", "Cow"] %}
+                            {% if cowi.sex in COW_SEXES_FEMALE %}
                             <option>{{cowi.tag_number}}</option>
                             {% endif %}
                             {% endfor %}
@@ -397,10 +397,9 @@ content %}
                         <input name="owner" id="newCowOwner" type="text" class="form-control" />
                         <h5>Sex:</h5>
                         <select name="sex" id="newCowSex" class="form-control">
-                            <option>Bull</option>
-                            <option>Cow</option>
-                            <option>Steer</option>
-                            <option>Heifer</option>
+                            {% for sex in COW_SEXES %}
+                            <option>{{sex}}</option>
+                            {% endfor %}
                         </select>
                     </form>
                 </div>

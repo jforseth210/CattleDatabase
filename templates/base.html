@@ -78,14 +78,14 @@
             onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))">
             <h5>Dam:</h5>
             <select name="dam" id="newCowDam" class="form-control">
-              {% for cow in cows %} {% if cow.sex in ["Heifer", "Cow"] %}
+              {% for cow in cows %} {% if cow.sex in COW_SEXES_FEMALE_POSSIBLE_PARENTS %}
               <option>{{cow.tag_number}}</option>
               {% endif %} {% endfor %}
               <option value="">N/A</option>
             </select>
             <h5>Sire:</h5>
             <select name="sire" id="newCowSire" class="form-control">
-              {% for cow in cows %} {% if cow.sex == "Bull" %}
+              {% for cow in cows %} {% if cow.sex == COW_SEXES_MALE_POSSIBLE_PARENTS %}
               <option>{{cow.tag_number}}</option>
               {% endif %} {% endfor %}
               <option value="">N/A</option>
@@ -97,14 +97,9 @@
             <input name="owner" id="newCowOwner" type="text" class="form-control" />
             <h5>Sex:</h5>
             <select name="sex" id="newCowSex" class="form-control">
-              <option>Bull</option>
-              <option>Bull (AI)</option>
-              <option>Steer</option>
-              <option>Cow</option>
-              <option>Heifer</option>
-              <option>Heifer (Replacement)</option>
-              <option>Heifer (Market)</option>
-              <option>Free-Martin</option>
+              {% for sex in COW_SEXES %}
+              <option>{{sex}}</option>
+              {%endfor%}
             </select>
           </form>
         </div>

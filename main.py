@@ -18,11 +18,12 @@ import argparse
 import miniupnpc
 import requests
 from flask import Flask, render_template, request, redirect, Markup
+from jinja2 import Environment, BaseLoader
 from flask_simplelogin import SimpleLogin, login_required
 import click
 import werkzeug.security
 
-from models import db, Cow, Event, Transaction, SearchResult, get_cow_from_tag
+from models import *
 from search_functions import *
 from setup_utils import *
 from sensitive_data import SECRET_KEY
@@ -52,6 +53,13 @@ app.register_blueprint(transactions, url_prefix='')
 db.init_app(app)
 
 
+app.jinja_env.globals['COW_SEXES'] = COW_SEXES
+app.jinja_env.globals['COW_SEXES_FEMALE'] = COW_SEXES_FEMALE
+app.jinja_env.globals['COW_SEXES_FEMALE_POSSIBLE_PARENTS'] = COW_SEXES_FEMALE_POSSIBLE_PARENTS
+app.jinja_env.globals['COW_SEXES_FEMALE_IMPOSSIBLE_PARENTS'] = COW_SEXES_FEMALE_IMPOSSIBLE_PARENTS
+app.jinja_env.globals['COW_SEXES_MALE'] = COW_SEXES_MALE
+app.jinja_env.globals['COW_SEXES_MALE_POSSIBLE_PARENTS'] = COW_SEXES_MALE_POSSIBLE_PARENTS
+app.jinja_env.globals['COW_SEXES_MALE_IMPOSSIBLE_PARENTS'] = COW_SEXES_MALE_IMPOSSIBLE_PARENTS
 def login_checker(provided_user):
     with open("config.json", "r") as file:
         config_string = file.read()
@@ -80,9 +88,6 @@ SimpleLogin(app, login_checker=login_checker, messages=messages)
 @login_required
 def home():
     return redirect("/cows")
-
-
-
 
 
 @app.route('/calendar/events/api')
@@ -146,6 +151,7 @@ def search():
                 re.search("\$.\d+.\d+", x.body).group().strip("$")), reverse=True)
     # Send it
     return render_template("search.html", query=query, results=results, unique_values=unique_values, checked_values=argument_dict)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
