@@ -4,9 +4,9 @@ from flask_simplelogin import login_required
 from models import Cow, Event, Transaction, get_cow_from_tag, db
 from setup_utils import get_usernames
 
-cattle = Blueprint('cattle', __name__, template_folder='templates')
+cows = Blueprint('cows', __name__, template_folder='templates')
 
-@cattle.route("/cows")
+@cows.route("/cows")
 @login_required
 def cows():
     cows = Cow.query.all()
@@ -14,7 +14,7 @@ def cows():
     return render_template("cows.html", cows=cows, usernames=usernames)
 
 
-@cattle.route("/cow/<tag_number>")
+@cows.route("/cow/<tag_number>")
 @login_required
 def show_cow(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
@@ -29,7 +29,7 @@ def show_cow(tag_number):
 
     return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total=transaction_total)
 
-@cattle.route("/newCow", methods=["POST"])
+@cows.route("/newCow", methods=["POST"])
 @login_required
 def new_cow():
     date = request.form.get('date')
@@ -64,7 +64,7 @@ def new_cow():
     return redirect(request.referrer)
 
 
-@ cattle.route("/cowexists/<tag_number>")
+@ cows.route("/cowexists/<tag_number>")
 @login_required
 def cow_exists(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
@@ -72,7 +72,7 @@ def cow_exists(tag_number):
     return "True" if cow else "False"
 
 
-@cattle.route("/cowChangeTagNumber", methods=["POST"])
+@cows.route("/cowChangeTagNumber", methods=["POST"])
 @login_required
 def change_tag_number():
     old_tag_number = request.form.get("old_tag_number")
@@ -84,7 +84,7 @@ def change_tag_number():
     return redirect("/cow/"+new_tag_number)
 
 
-@cattle.route("/deletecow", methods=["POST"])
+@cows.route("/deletecow", methods=["POST"])
 @login_required
 def delete_cow():
     tag_number = request.form.get("tag_number")
@@ -94,7 +94,7 @@ def delete_cow():
     return redirect('/cows')
 
 
-@cattle.route("/transferOwnership", methods=["POST"])
+@cows.route("/transferOwnership", methods=["POST"])
 @login_required
 def transferOwnership():
     tag_number = request.form.get("tag_number")
@@ -116,7 +116,7 @@ def transferOwnership():
     return redirect(request.referrer)
 
 
-@cattle.route("/cowAddParent", methods=["POST"])
+@cows.route("/cowAddParent", methods=["POST"])
 @login_required
 def cow_add_parent():
     tag_number = request.form.get("tag_number")
