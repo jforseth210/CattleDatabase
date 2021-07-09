@@ -84,6 +84,18 @@ def change_tag_number():
     return redirect("/cows/cow/"+new_tag_number)
 
 
+@cows.route("/change_sex", methods=["POST"])
+@login_required
+def change_sex():
+    tag_number = request.form.get("tag_number")
+    sex = request.form.get("sex")
+
+    cow = get_cow_from_tag(tag_number)
+    cow.sex = sex
+    db.session.commit()
+    return redirect("/cows/cow/"+tag_number)
+
+
 @cows.route("/delete", methods=["POST"])
 @login_required
 def delete_cow():

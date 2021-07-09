@@ -51,6 +51,18 @@ content %}
                         </svg>
                         Change Tag Number
                     </button>
+                    <button class="m-2 btn btn-warning" data-toggle="modal" data-target="#sexChangeModal">
+                        {% if cow.sex in COW_SEXES_MALE%}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gender-male" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M9.5 2a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V2.707L9.871 6.836a5 5 0 1 1-.707-.707L13.293 2H9.5zM6 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+                          </svg>
+                        {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gender-female" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 1a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM3 5a5 5 0 1 1 5.5 4.975V12h2a.5.5 0 0 1 0 1h-2v2.5a.5.5 0 0 1-1 0V13h-2a.5.5 0 0 1 0-1h2V9.975A5 5 0 0 1 3 5z"/>
+                          </svg>
+                        {% endif %}
+                        Change Sex
+                    </button>
                     {% if not cow.get_dam() or not cow.get_sire() %}
                     <button class="m-2 btn btn-success" data-toggle="modal" data-target="#addParentModal">
                         Add Parent
@@ -249,6 +261,34 @@ content %}
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <input type="submit" form="tagNumberChangeForm" class="btn btn-primary" value="Update" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="sexChangeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Change Sex</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                    <form id="sexChangeForm" method="POST" action="/cows/change_sex">
+                        <input type="hidden" name="tag_number" value="{{cow.tag_number}}">
+                        <select name="sex" class="form-control">
+                        {% for sex in COW_SEXES%}
+                        <option>{{sex}}</option>
+                        {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="submit" form="sexChangeForm" class="btn btn-primary" value="Update" />
                 </div>
             </div>
         </div>
