@@ -29,6 +29,7 @@ from setup_utils import *
 from sensitive_data import SECRET_KEY
 
 from api import api
+from api_cows import api_cows
 from cows import cows
 from events import events
 from transactions import transactions
@@ -46,6 +47,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = SECRET_KEY
 
 app.register_blueprint(api, url_prefix='/api')
+app.register_blueprint(api_cows, url_prefix='/api/cows')
 app.register_blueprint(cows, url_prefix='/cows')
 app.register_blueprint(events, url_prefix='/events')
 app.register_blueprint(transactions, url_prefix='/transactions')
