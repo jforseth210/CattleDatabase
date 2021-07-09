@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, flash, Markup
 from flask_simplelogin import login_required
+from sqlalchemy.exc import IntegrityError
 
 from models import Event, Cow, db, get_cow_from_tag
 
@@ -118,6 +119,17 @@ def event_change_name():
 def delete_event():
     event_id = request.form.get("event_id")
     event = Event.query.filter_by(event_id=event_id).first()
-    db.session.delete(event)
-    db.session.commit()
+    try: 
+        db.session.delete(event)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash(
+            Markup(
+                    "Please delete all transactions from this event first. The following transactions are preventing event deletion: <ul>"
+                + "".join("<li>" + transaction.name + "</li>"for transaction in event.transactions)+"</ul>"
+            )
+        )
+
+        return redirect(request.referrer)
     return redirect('/events')
