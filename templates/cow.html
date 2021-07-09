@@ -264,7 +264,7 @@ content %}
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="addToExistingEventForm" method="POST" action="/eventAddRemoveCows">
+                    <form id="addToExistingEventForm" method="POST" action="/events/update_cows">
                         <h5>Event</h5>
                         <select class="form-control" name="event">
                             {% for event in events|sort(attribute="date")|reverse %}
@@ -421,7 +421,7 @@ content %}
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="newEventForm" method="post" action="/newEvent">
+                    <form id="newEventForm" method="post" action="/events/new">
                         <input name="tag_number" value="{{cow.tag_number}}" hidden>
                         <h5>Date</h5>
                         <small id="dateHelperText" class="form-text text-success"></small>

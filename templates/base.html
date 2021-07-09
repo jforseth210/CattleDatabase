@@ -123,7 +123,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <form id="newEventForm" method="post" action="/newEvent">
+          <form id="newEventForm" method="post" action="/events/new">
             <h5>Cows</h5>
             {% for cow in cows %}
             <div class="form-check form-check-inline">
@@ -195,7 +195,7 @@
     function checkForEvents(date) {
       console.log("Checking if event on " + date.value + "");
       const Http = new XMLHttpRequest();
-      const url = "/dateexists/" + date.value;
+      const url = "/events/exists/" + date.value;
       Http.open("GET", url);
       Http.send();
       Http.onreadystatechange = (e) => {

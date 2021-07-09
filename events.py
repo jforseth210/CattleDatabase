@@ -10,7 +10,7 @@ def calendar():
     cows = Cow.query.all()
     return render_template('calendar.html', cows=cows)
 
-@events.route("/events")
+@events.route("/")
 @login_required
 def load_events():
     events = Event.query.all()
@@ -26,7 +26,7 @@ def show_event(event_id):
         return redirect(request.referrer)
     return render_template("event.html", event=event, cows=Cow.query.all())
 
-@ events.route("/newEvent", methods=["POST"])
+@ events.route("/new", methods=["POST"])
 @login_required
 def new_event():
     tag = request.form.get('tag_number')
@@ -48,7 +48,7 @@ def new_event():
     return redirect(request.referrer+"#events")
 
 
-@events.route("/dateexists/<date>")
+@events.route("/exists/<date>")
 @login_required
 def check_if_date_exists(date):
     events = Event.query.filter_by(date=date).all()
@@ -60,7 +60,7 @@ def check_if_date_exists(date):
         return "No events on this date"
 
 
-@events.route("/eventAddRemoveCows", methods=["POST"])
+@events.route("/update_cows", methods=["POST"])
 @login_required
 def event_add_remove_cows():
     all_cows = request.form.getlist("all_cows")
@@ -77,7 +77,7 @@ def event_add_remove_cows():
     return redirect(request.referrer)
 
 
-@ events.route("/eventChangeDate", methods=["POST"])
+@ events.route("/change_date", methods=["POST"])
 @login_required
 def event_change_date():
     event_id = request.form.get("event_id")
@@ -89,7 +89,7 @@ def event_change_date():
     return redirect(request.referrer)
 
 
-@ events.route("/eventChangeDescription", methods=["POST"])
+@ events.route("/change_description", methods=["POST"])
 @login_required
 def event_change_description():
     event_id = request.form.get("event_id")
@@ -101,7 +101,7 @@ def event_change_description():
     return redirect(request.referrer)
 
 
-@ events.route("/eventChangeName", methods=["POST"])
+@ events.route("/change_name", methods=["POST"])
 @login_required
 def event_change_name():
     event_id = request.form.get("event_id")
@@ -113,7 +113,7 @@ def event_change_name():
     return redirect(request.referrer)
 
 
-@events.route("/deleteevent", methods=["POST"])
+@events.route("/delete", methods=["POST"])
 @login_required
 def delete_event():
     event_id = request.form.get("event_id")

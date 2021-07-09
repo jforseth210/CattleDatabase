@@ -47,7 +47,7 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(cows, url_prefix='/cows')
-app.register_blueprint(events, url_prefix='')
+app.register_blueprint(events, url_prefix='/events')
 app.register_blueprint(transactions, url_prefix='')
 
 db.init_app(app)
