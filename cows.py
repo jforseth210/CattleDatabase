@@ -8,10 +8,10 @@ cows = Blueprint('cows', __name__, template_folder='templates')
 
 @cows.route("/")
 @login_required
-def cows():
-    cows = Cow.query.all()
+def list_cows():
+    cow_list = Cow.query.all()
     usernames = get_usernames()
-    return render_template("cows.html", cows=cows, usernames=usernames)
+    return render_template("cows.html", cows=cow_list, usernames=usernames)
 
 
 @cows.route("/cow/<tag_number>")

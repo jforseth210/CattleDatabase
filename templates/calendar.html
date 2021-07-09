@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block title%}Calendar{% endblock %}
 {% block head %}
-<link href='static/calendar/lib/main.css' rel='stylesheet' />
-<script src='static/calendar/lib/main.js'></script>
+<link href='/static/calendar/lib/main.css' rel='stylesheet' />
+<script src='/static/calendar/lib/main.js'></script>
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", "calendar/events/api", false); // false for synchronous request
+        xmlHttp.open("GET", "/calendar/events/api", false); // false for synchronous request
         xmlHttp.send(null);
         events = JSON.parse(xmlHttp.responseText);
         console.log(events);

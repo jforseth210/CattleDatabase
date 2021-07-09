@@ -106,7 +106,7 @@ content %}
                         </tr>
                         {% for transaction in event.transactions %}
                         <tr class="clickable-tr"
-                            onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
+                            onclick="window.location.href = '/transactions/transaction/{{transaction.transaction_id}}';">
                             <td>
                                 <h7>{{transaction.tofrom}}</h7>
                             </td>
@@ -205,7 +205,7 @@ content %}
                 </button>
             </div>
             <div class="modal-body">
-                <form id="nameChangeForm" method="POST" action="/eventChangeName">
+                <form id="nameChangeForm" method="POST" action="/events/change_name">
                     <input type="hidden" name="event_id" value="{{event.event_id}}">
                     <input name="name" class="form-control" value="{{event.name}}" />
                 </form>

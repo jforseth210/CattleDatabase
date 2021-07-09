@@ -52,13 +52,13 @@ class Cow(db.Model):
         return Cow.query.filter_by(cow_id=self.sire_id).first()
 
     def get_calves(self):
-        if self.sex in ["Cow", "Heifer"]:
+        if self.sex in COW_SEXES_FEMALE:
             return Cow.query.filter_by(dam_id=self.cow_id)
 
         # There shouldn't be any reason get_calves() is ever
         # called on a steer, but if so, I would assume the
         # steer is the sire?
-        elif self.sex in ["Bull", "Steer"]:
+        elif self.sex in COW_SEXES_MALE:
             return Cow.query.filter_by(sire_id=self.cow_id)
 
     def get_events(self):
@@ -119,7 +119,7 @@ class Event(db.Model):
         return query_match and date_match and name_match
 
     def toSearchResult(self, query):
-        return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/event/{self.event_id}")
+        return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/events/event/{self.event_id}")
 
     def __repr__(self):
         return f"Event on {self.date}: {self.name} - {self.description}"
@@ -161,7 +161,7 @@ class Transaction(db.Model):
 
     def toSearchResult(self, query):
         if query:
-            return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/transaction/{self.transaction_id}")
+            return SearchResult(self.name, repr(self).replace(query, f"<b>{query}</b>"), f"/transactions/transaction/{self.transaction_id}")
         return SearchResult(self.name, repr(self), f"/transaction/{self.transaction_id}")
 
     def __repr__(self):

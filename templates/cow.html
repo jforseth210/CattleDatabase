@@ -138,7 +138,7 @@ content %}
                         <th>Description</th>
                         </tr>
                         {% for event in cow.events|sort(attribute='date') %}
-                        <tr class="clickable-tr" onclick="window.location.href = '/event/{{event.event_id}}';">
+                        <tr class="clickable-tr" onclick="window.location.href = '/events/event/{{event.event_id}}';">
                             <td>
                                 <h7>{{event.date}}<h7>
                             </td>
@@ -164,7 +164,7 @@ content %}
                         {% for event in cow.events %}
                         {% for transaction in event.transactions %}
                         <tr class="clickable-tr"
-                            onclick="window.location.href = '/transaction/{{transaction.transaction_id}}';">
+                            onclick="window.location.href = '/transactions/transaction/{{transaction.transaction_id}}';">
                             <td>
                                 <h7>{{transaction.event.date}}</h7>
                             </td>

@@ -34,7 +34,7 @@
           <a class="nav-link" href="/transactions">Transactions<span class="sr-only"></span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/calendar">Calendar<span class="sr-only"></span></a>
+          <a class="nav-link" href="/events/calendar">Calendar<span class="sr-only"></span></a>
         </li>
       </ul>
       <ul class="navbar-nav ml-auto mr-4">
@@ -56,9 +56,21 @@
   {% with messages = get_flashed_messages() %}
   {% if messages %}
   {% for message in messages %}
-  <div class="modal fade show" role="dialog">
-    {{message}}
+  <div class="modal fade in" id="flashModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        {{message}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
   </div>
+</div>
   {% endfor %}
   {% endif %}
   {% endwith %}
@@ -85,7 +97,7 @@
             </select>
             <h5>Sire:</h5>
             <select name="sire" id="newCowSire" class="form-control">
-              {% for cow in cows %} {% if cow.sex == COW_SEXES_MALE_POSSIBLE_PARENTS %}
+              {% for cow in cows %} {% if cow.sex in COW_SEXES_MALE_POSSIBLE_PARENTS %}
               <option>{{cow.tag_number}}</option>
               {% endif %} {% endfor %}
               <option value="">N/A</option>
@@ -157,6 +169,7 @@
   <script src="/static/bootstrap/js/Optional Dependencies/popper.min.js"></script>
   <script src="/static/bootstrap/js/bootstrap.min.js"></script>
   <script>
+    $('#flashModal').modal('show');
     function validateTagNumber(field) {
       console.log("Checking if " + field.value + " available");
       const Http = new XMLHttpRequest();

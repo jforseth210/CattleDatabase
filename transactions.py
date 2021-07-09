@@ -4,7 +4,7 @@ from flask_simplelogin import login_required
 
 from models import Transaction, Cow, Event, db, get_cow_from_tag
 transactions = Blueprint('transactions', __name__, template_folder='templates')
-@transactions.route("/transactions")
+@transactions.route("/")
 @login_required
 def show_transactions():
     transactions = Transaction.query.all()
@@ -118,7 +118,7 @@ def transaction_change_to_from():
     return redirect(request.referrer)
 
 
-@transactions.route("/deletetransaction", methods=["POST"])
+@transactions.route("/delete", methods=["POST"])
 @login_required
 def delete_transaction():
     transaction_id = request.form.get("transaction_id")

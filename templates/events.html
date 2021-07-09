@@ -14,7 +14,7 @@
             </tr>
         </thead>
         {% for event in events|sort(attribute='date')|reverse %}
-        <tr class="clickable-tr" onclick="window.location.href = '/event/{{event.event_id}}';">
+        <tr class="clickable-tr" onclick="window.location.href = '/events/event/{{event.event_id}}';">
             <td>
                 <h7>{{event.date}}<h7>
             </td>
