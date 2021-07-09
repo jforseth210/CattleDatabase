@@ -92,7 +92,7 @@ class Cow(db.Model):
         return search_match and tag_match and sex_match and owner_match and sire_match and dam_match
 
     def toSearchResult(self, query):
-        return SearchResult(self.tag_number, repr(self).replace(query, f"<b>{query}</b>"), f"/cow/{self.tag_number}")
+        return SearchResult(self.tag_number, repr(self).replace(query, f"<b>{query}</b>"), f"/cows/cow/{self.tag_number}")
 
     def get_first_digit_of_tag(self):
         first_digit = re.search("\d", self.tag_number)

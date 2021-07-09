@@ -74,7 +74,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <form id="newCowForm" method="post" action="/newCow"
+          <form id="newCowForm" method="post" action="/cows/new"
             onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))">
             <h5>Dam:</h5>
             <select name="dam" id="newCowDam" class="form-control">
@@ -160,7 +160,7 @@
     function validateTagNumber(field) {
       console.log("Checking if " + field.value + " available");
       const Http = new XMLHttpRequest();
-      const url = "/cowexists/" + field.value;
+      const url = "/cows/exists/" + field.value;
       Http.open("GET", url);
       Http.send();
       Http.onreadystatechange = (e) => {

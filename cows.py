@@ -6,7 +6,7 @@ from setup_utils import get_usernames
 
 cows = Blueprint('cows', __name__, template_folder='templates')
 
-@cows.route("/cows")
+@cows.route("/")
 @login_required
 def cows():
     cows = Cow.query.all()
@@ -29,7 +29,7 @@ def show_cow(tag_number):
 
     return render_template("cow.html", cow=cow, cows=Cow.query.all(), events=events, transaction_total=transaction_total)
 
-@cows.route("/newCow", methods=["POST"])
+@cows.route("/new", methods=["POST"])
 @login_required
 def new_cow():
     date = request.form.get('date')
@@ -64,7 +64,7 @@ def new_cow():
     return redirect(request.referrer)
 
 
-@ cows.route("/cowexists/<tag_number>")
+@cows.route("/exists/<tag_number>")
 @login_required
 def cow_exists(tag_number):
     cow = Cow.query.filter_by(tag_number=tag_number).first()
@@ -72,7 +72,7 @@ def cow_exists(tag_number):
     return "True" if cow else "False"
 
 
-@cows.route("/cowChangeTagNumber", methods=["POST"])
+@cows.route("/change_tag_number", methods=["POST"])
 @login_required
 def change_tag_number():
     old_tag_number = request.form.get("old_tag_number")
@@ -81,10 +81,10 @@ def change_tag_number():
     cow = get_cow_from_tag(old_tag_number)
     cow.tag_number = new_tag_number
     db.session.commit()
-    return redirect("/cow/"+new_tag_number)
+    return redirect("/cows/cow/"+new_tag_number)
 
 
-@cows.route("/deletecow", methods=["POST"])
+@cows.route("/delete", methods=["POST"])
 @login_required
 def delete_cow():
     tag_number = request.form.get("tag_number")
@@ -94,7 +94,7 @@ def delete_cow():
     return redirect('/cows')
 
 
-@cows.route("/transferOwnership", methods=["POST"])
+@cows.route("/transfer_ownership", methods=["POST"])
 @login_required
 def transferOwnership():
     tag_number = request.form.get("tag_number")
@@ -116,7 +116,7 @@ def transferOwnership():
     return redirect(request.referrer)
 
 
-@cows.route("/cowAddParent", methods=["POST"])
+@cows.route("/add_parent", methods=["POST"])
 @login_required
 def cow_add_parent():
     tag_number = request.form.get("tag_number")

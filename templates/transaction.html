@@ -94,7 +94,7 @@ content %}
                             <th>Sex</th>
                         </tr>
                         {% for cow in transaction.get_cows() %}
-                        <tr class="clickable-tr" onclick="window.location.href = '/cow/{{cow.tag_number}}';">
+                        <tr class="clickable-tr" onclick="window.location.href = '/cows/cow/{{cow.tag_number}}';">
                             <td>
                                 <h7>{{cow.tag_number}}</h7>
                             </td>

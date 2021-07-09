@@ -13,15 +13,15 @@ content %}
                         <li>Sex: {{cow.sex}}</li>
                         {% if cow.dam_id %}
                         <li>
-                            <a href="/cow/{{cow.get_dam().tag_number}}">Dam: {{cow.get_dam().tag_number}}</a>
+                            <a href="/cows/cow/{{cow.get_dam().tag_number}}">Dam: {{cow.get_dam().tag_number}}</a>
                         </li>
                         {% endif %} {% if cow.sire_id %}
                         <li>
-                            <a href="/cow/{{cow.get_sire().tag_number}}">Sire: {{cow.get_sire().tag_number}}</a>
+                            <a href="/cows/cow/{{cow.get_sire().tag_number}}">Sire: {{cow.get_sire().tag_number}}</a>
                         </li>
                         {% endif %}
                     </ul>
-                    <form method="post" action="/deletecow" class="p-0 m-2">
+                    <form method="post" action="/cows/delete" class="p-0 m-2">
                         <input name="tag_number" value="{{cow.tag_number}}" hidden>
                         <button type="submit" class="btn btn-danger">
                             <!-- Trash icon-->
@@ -96,7 +96,7 @@ content %}
                         <th>Calves</th>
                         </tr>
                         {% for calf in cow.get_calves() %}
-                        <tr class="clickable-tr" onclick="window.location.href = '/cow/{{calf.tag_number}}';">
+                        <tr class="clickable-tr" onclick="window.location.href = '/cows/cow/{{calf.tag_number}}';">
                             <td>
                                 <h7>{{ calf.tag_number }}</h7>
                             </td>
@@ -207,7 +207,7 @@ content %}
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="transferForm" method="POST" action="/transferOwnership">
+                    <form id="transferForm" method="POST" action="/cows/transfer_ownership">
                         <input type="hidden" name="tag_number" value="{{cow.tag_number}}">
                         <h5>New Owner</h5>
                         <input type="text" class="form-control" name="newOwner" />
@@ -241,7 +241,7 @@ content %}
                 </div>
                 <div class="modal-body">
                     <p>Changing this <i>shouldn't</i> break anything, but it might. Be careful!</p>
-                    <form id="tagNumberChangeForm" method="POST" action="/cowChangeTagNumber">
+                    <form id="tagNumberChangeForm" method="POST" action="/cows/change_tag_number">
                         <input type="hidden" name="old_tag_number" value="{{cow.tag_number}}">
                         <input name="new_tag_number" class="form-control" value="{{cow.tag_number}}" />
                     </form>
@@ -294,7 +294,7 @@ content %}
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="addParentForm" method="POST" action="/cowAddParent">
+                    <form id="addParentForm" method="POST" action="/cows/add_parent">
                         <input name="tag_number" value="{{cow.tag_number}}" hidden>
                         {% if not cow.get_dam() and not cow.get_sire()%}
                         <h5>Parent</h5>
@@ -350,7 +350,7 @@ content %}
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="newCowForm" method="post" action="/newCow"
+                    <form id="newCowForm" method="post" action="/cows/new"
                         onsubmit="return validateTagNumber(document.getElementById('newCowTagNumber'))">
                         <h5>Date:</h5>
                         <input name="date" type="date" class="form-control" />
