@@ -10,6 +10,7 @@ api_cows = Blueprint('api_cows', __name__, template_folder='templates')
 @login_required(basic=True)
 def api_cows_delete_cow(tag_number):
     tag_number =  urllib.parse.unquote(tag_number)
+    tag_number = tag_number.replace("+","")
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     db.session.delete(cow)
     db.session.commit()
@@ -19,6 +20,7 @@ def api_cows_delete_cow(tag_number):
 @login_required(basic=True)
 def add_cow_api_cows(new_cow_json):
     new_cow_json = urllib.parse.unquote(new_cow_json)
+    tag_number = tag_number.replace("+","")
     new_cow_dict = json.loads(new_cow_json)
     print(new_cow_dict)
     if new_cow_dict["dam"] == "Not+Applicable":
@@ -57,6 +59,7 @@ def add_cow_api_cows(new_cow_json):
 @login_required(basic=True)
 def show_cow_api_cows(tag_number):
     tag_number = urllib.parse.unquote(tag_number)
+    tag_number = tag_number.replace("+","")
     cow = Cow.query.filter_by(tag_number=tag_number).first()
     if cow:
         return json.dumps({
@@ -89,6 +92,7 @@ def get_sex_list():
 @login_required(basic=True)
 def add_parent_api_cows(new_parent_json):
     new_parent_json = urllib.parse.unquote(new_parent_json)
+    tag_number = tag_number.replace("+","")
     new_parent_dict = json.loads(new_parent_json)
     print(new_parent_dict)
     cow = get_cow_from_tag(str(new_parent_dict["tag_number"]))
@@ -105,6 +109,7 @@ def add_parent_api_cows(new_parent_json):
 @login_required(basic=True)
 def change_tag_api_cows(tag_change_json):
     tag_change_json = urllib.parse.unquote(tag_change_json)
+    tag_number = tag_number.replace("+","")
     tag_change_dict = json.loads(tag_change_json)
     cow = Cow.query.filter_by(tag_number=tag_change_dict["old_tag"]).first()
     cow.tag_number = tag_change_dict["new_tag"]
@@ -115,6 +120,7 @@ def change_tag_api_cows(tag_change_json):
 @login_required(basic=True)
 def transfer_ownership_api_cows(transfer_ownership_json):
     transfer_ownership_json_ = urllib.parse.unquote(transfer_ownership_json)
+    tag_number = tag_number.replace("+","")
     transfer_ownership_dict = json.loads(transfer_ownership_json)
 
     transfer_ownership_dict["description"] = transfer_ownership_dict["description"].replace("+"," ")
