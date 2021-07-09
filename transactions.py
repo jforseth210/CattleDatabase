@@ -24,7 +24,7 @@ def show_transaction(transaction_id):
         return redirect(request.referrer)
     return render_template("transaction.html", transaction=transaction, all_cows=Cow.query.all())
 
-@ transactions.route("/newTransaction", methods=["POST"])
+@ transactions.route("/new", methods=["POST"])
 @login_required
 def new_transaction():
     event_id = request.form.get('event_id')
@@ -48,7 +48,7 @@ def new_transaction():
     return redirect(request.referrer+"#transactions")
 
 
-@transactions.route("/transactionAddRemoveCows", methods=["POST"])
+@transactions.route("/update_cows", methods=["POST"])
 @login_required
 def transaction_add_remove_cows():
     all_cows = request.form.getlist("all_cows")
@@ -66,7 +66,7 @@ def transaction_add_remove_cows():
     return redirect(request.referrer)
 
 
-@ transactions.route("/transactionChangePrice", methods=["POST"])
+@ transactions.route("/change_price", methods=["POST"])
 @login_required
 def transaction_change_price():
     transaction_id = request.form.get("transaction_id")
@@ -79,7 +79,7 @@ def transaction_change_price():
     return redirect(request.referrer)
 
 
-@ transactions.route("/transactionChangeDescription", methods=["POST"])
+@ transactions.route("/change_description", methods=["POST"])
 @login_required
 def transaction_change_description():
     transaction_id = request.form.get("transaction_id")
@@ -92,7 +92,7 @@ def transaction_change_description():
     return redirect(request.referrer)
 
 
-@ transactions.route("/transactionChangeName", methods=["POST"])
+@ transactions.route("/change_name", methods=["POST"])
 @login_required
 def transaction_change_name():
     transaction_id = request.form.get("transaction_id")
@@ -105,7 +105,7 @@ def transaction_change_name():
     return redirect(request.referrer)
 
 
-@ transactions.route("/transactionChangeToFrom", methods=["POST"])
+@ transactions.route("/change_to_from", methods=["POST"])
 @login_required
 def transaction_change_to_from():
     transaction_id = request.form.get("transaction_id")

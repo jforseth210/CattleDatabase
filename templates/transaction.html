@@ -20,7 +20,7 @@ content %}
                         <li>To: {{transaction.tofrom}}</li>
                         {% endif %}
                     </ul>
-                    <form method="post" action="/deletetransaction" class="p-0 m-2">
+                    <form method="post" action="/transactions/delete" class="p-0 m-2">
                         <input name="transaction_id" value="{{transaction.transaction_id}}" hidden />
                         <button type="submit" class="btn btn-danger">
                             <!-- Trash icon-->
@@ -146,7 +146,7 @@ content %}
                 </button>
             </div>
             <div class="modal-body">
-                <form id="descriptionChangeForm" method="POST" action="/transactionChangeDescription">
+                <form id="descriptionChangeForm" method="POST" action="/transactions/change_description">
                     <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
                     <textarea name="description" class="form-control">{{transaction.description}}</textarea>
                 </form>
@@ -169,7 +169,7 @@ content %}
                 </button>
             </div>
             <div class="modal-body">
-                <form id="nameChangeForm" method="POST" action="/transactionChangeName">
+                <form id="nameChangeForm" method="POST" action="/transactions/change_name">
                     <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
                     <input name="name" class="form-control" value="{{transaction.name}}" />
                 </form>
@@ -192,7 +192,7 @@ aria-hidden="true">
             </button>
         </div>
         <div class="modal-body">
-            <form id="transactionAddRemoveCowsForm" method="POST" action="/transactionAddRemoveCows">
+            <form id="transactionAddRemoveCowsForm" method="POST" action="/transactions/update_cows">
                 <input type="hidden" name="transaction" value="{{transaction.transaction_id}}">
                 {% for cow in all_cows %}
                 <div class="form-check">
@@ -223,7 +223,7 @@ aria-hidden="true">
                 </button>
             </div>
             <div class="modal-body">
-                <form id="tofromChangeForm" method="POST" action="/transactionChangeToFrom">
+                <form id="tofromChangeForm" method="POST" action="/transactions/change_to_from">
                     <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
                     <input name="tofrom" class="form-control" value="{{transaction.tofrom}}" />
                 </form>
@@ -246,7 +246,7 @@ aria-hidden="true">
                 </button>
             </div>
             <div class="modal-body">
-                <form id="transactionChangePriceForm" method="POST" action="/transactionChangePrice">
+                <form id="transactionChangePriceForm" method="POST" action="/transactions/change_price">
                     <input type="hidden" name="transaction_id" value="{{transaction.transaction_id}}">
                     <h5>New Amount</h5>
                     <small><i>Enter a negative number for expenses, postive for income</i></small>
