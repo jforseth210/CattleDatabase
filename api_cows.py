@@ -68,7 +68,9 @@ def show_cow_api_cows(tag_number):
             "dam": cow.get_dam().tag_number if cow.get_dam() else "N/A",
             "sire": cow.get_sire().tag_number if cow.get_sire() else "N/A",
             "sex": cow.sex,
-            "calves": [(calf.tag_number, calf.sex) for calf in cow.get_calves()] if cow.get_calves() else []
+            "calves": [(calf.tag_number, calf.sex) for calf in cow.get_calves()] if cow.get_calves() else [],
+            "events": sorted([(event.name, event.date) for event in cow.get_events()], key=lambda a: a[1]) if cow.get_events() else [],
+            "transactions": sorted([(transaction.name, transaction.get_date() + ": $" + str(transaction.price)) for transaction in cow.get_transactions()], key=lambda a: a[1]) if cow.get_transactions() else []
         })
     return "{}", 404
 
@@ -109,12 +111,24 @@ def add_parent_api_cows(new_parent_json):
 @login_required(basic=True)
 def change_tag_api_cows(tag_change_json):
     tag_change_json = urllib.parse.unquote(tag_change_json)
-    tag_number_json = tag_number_json.replace("+", " ")
+    tag_change_json = tag_change_json.replace("+", " ")
     tag_change_dict = json.loads(tag_change_json)
     cow = Cow.query.filter_by(tag_number=tag_change_dict["old_tag"]).first()
     cow.tag_number = tag_change_dict["new_tag"]
     db.session.commit()
     return "{'succeeded':'True'}"
+
+@api_cows.route("/change_sex/<sex_change_json>", methods=["POST"])
+@login_required(basic=True)
+def change_sex_api_cows(sex_change_json):
+    sex_change_json = urllib.parse.unquote(sex_change_json)
+    sex_change_json = sex_change_json.replace("+", " ")
+    sex_change_dict = json.loads(sex_change_json)
+    cow = Cow.query.filter_by(tag_number=sex_change_dict["tag_number"]).first()
+    cow.sex = sex_change_dict["sex"]
+    db.session.commit()
+    return "{'succeeded':'True'}"
+
 
 @api_cows.route("/transfer_ownership/<transfer_ownership_json>", methods=["POST"])
 @login_required(basic=True)
